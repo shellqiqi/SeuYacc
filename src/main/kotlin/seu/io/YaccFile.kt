@@ -1,5 +1,6 @@
 package seu.io
 
+import seu.lr.Production
 import java.io.BufferedReader
 import java.io.FileReader
 
@@ -9,11 +10,10 @@ class YaccFile(filePath: String) {
 
     var headers: StringBuffer = StringBuffer()
     var instructions: HashMap<String, String> = HashMap()
-    var rules: HashMap<String, ArrayList<String>> = HashMap()
+    var rules: HashMap<Production, String?> = HashMap()
     var userSeg: StringBuffer = StringBuffer()
 
     init {
-        reader = BufferedReader(FileReader(filePath))
         readInstructions()
         readRules()
         readUserSeg()
@@ -44,11 +44,43 @@ class YaccFile(filePath: String) {
     }
 
     private fun readRules() {
-        while (true) {
-            val lineOfReader = reader.readLine() ?: throw Exception("Lex format error - miss user segment")
+        var left: String? = null
+        lineRead@ while (true) {
+            val lineOfReader = reader.readLine()?.trim() ?: throw Exception("Lex format error - miss user segment")
             if (lineOfReader.startsWith("%%")) return
             else {
-                // TODO: parse rules
+                var remain: String? = null
+                var right: String = ""
+                var action: String? = null
+                when {
+                    lineOfReader.startsWith(";") -> {
+                        left = null
+                        continue@lineRead
+                    }
+                    lineOfReader.startsWith("|") ->
+                        remain = lineOfReader.drop(1).trim()
+                    else -> {
+                        left = lineOfReader.substringBefore(":").trim()
+                        remain = lineOfReader.substringAfter(":").trim()
+                    }
+                }
+                var indexOfLeftBrace = remain.indexOf('{', 0)
+                while (indexOfLeftBrace != -1 && remain[indexOfLeftBrace - 1] == '\'' && remain[indexOfLeftBrace + 1] == '\'') {
+                    indexOfLeftBrace = remain.indexOf('{', indexOfLeftBrace + 1)
+                }
+
+                when {
+                    indexOfLeftBrace == -1 -> right = remain
+                    else -> {
+                        action = remain.substring(indexOfLeftBrace, remain.length).trim()
+                        right = remain.substring(0, indexOfLeftBrace - 1).trim()
+                    }
+                }
+
+                if (left.isNullOrEmpty() || right.isEmpty())
+                    throw Exception("Lex format error - wrong production input")
+                else
+                    rules.put(Production(left!!, right), action)
             }
         }
     }
