@@ -6,17 +6,15 @@ class LR(rules: List<Production>,
     /* context free grammar stuff */
     val productions: ArrayList<Production> = rules as ArrayList<Production>
 
-    /**
-     * transfer to augmented grammar
-     */
     init {
         toAugment()
     }
 
+    /**
+     * transfer to augmented grammar
+     */
     private fun toAugment(){
-        if (!non_terminals.contains(start)) throw Error("Definition Error - Unknown start")
-//        productions.add(Production("", start))
-        start = ""
+
     }
 
 
