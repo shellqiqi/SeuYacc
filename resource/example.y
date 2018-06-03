@@ -1,7 +1,7 @@
 %{
 #include <ctype.h>
 %}
-%token DIGIT
+%token DIGIT  HELLO
 %%
 line   : expr '\n'        { printf("%d\n", $1); }
        ;

@@ -23,6 +23,7 @@ class YaccFileTest {
     fun readInstructions() {
         val instructions: HashMap<String, String> = HashMap()
         instructions["DIGIT"] = "%token"
+        instructions["HELLO"] = "%token"
         kotlin.test.assertEquals(instructions, yaccFile.instructions)
     }
 

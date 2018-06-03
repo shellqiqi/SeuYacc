@@ -11,9 +11,10 @@ class YaccFile(filePath: String) {
     var headers: StringBuffer = StringBuffer()
     var instructions: HashMap<String, String> = HashMap()
     var rules: HashMap<Production, String?> = HashMap()
-    var terminals: HashSet<String> = HashSet()
-    var nonTerminals: HashSet<String> = HashSet()
     var userSeg: StringBuffer = StringBuffer()
+
+    private var terminals: HashSet<String> = HashSet()
+    private var nonTerminals: HashSet<String> = HashSet()
 
     init {
         readInstructions()
@@ -30,9 +31,14 @@ class YaccFile(filePath: String) {
                 else -> {
                     val split = lineOfReader.split(' ')
                     val tag = split[0]
-                    val token = split[1]
-                    terminals.add(token)
-                    instructions[token] = tag
+                    split.subList(1, split.size)
+                            .filter { s: String -> s.isNotEmpty() }
+                            .forEach { s: String ->
+                                kotlin.run {
+                                    terminals.add(s)
+                                    instructions[s] = tag
+                                }
+                            }
                 }
             }
         }
@@ -86,7 +92,7 @@ class YaccFile(filePath: String) {
                     val pro = Production(left!!, right)
                     rules[pro] = action
                     nonTerminals.add(pro.left)
-                    pro.right.forEach { t: String? ->  if(t!!.startsWith("'")&&t.endsWith("'")) terminals.add(t)}
+                    pro.right.forEach { t: String? -> if (t!!.startsWith("'") && t.endsWith("'")) terminals.add(t) }
                 }
             }
         }
