@@ -1,10 +1,12 @@
 package seu.lr
 
-class LrState(pros: ArrayList<Production>, start:Int = 0) {
-    private var lrItems : ArrayList<LrItem> = arrayListOf()
+class LrState(lrItems: HashSet<LrItem>) {
+    val lrItems = lrItems.clone()
 
-    init {
-        lrItems.add(LrItem(pros[start], 0, arrayListOf()))
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
+        return true
     }
 }
