@@ -16,6 +16,6 @@ class Symbol(val label :Int, val name :String) {
     }
 
     override fun toString(): String {
-        return "Symbol($label, $name)"
+        return name
     }
 }

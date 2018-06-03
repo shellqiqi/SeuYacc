@@ -31,7 +31,7 @@ class YaccFileTest {
     @Ignore
     fun readRules() {
         println("rules:")
-        yaccFile.rules.forEach { (t, u) -> println(t.toString() + "\t" + u.toString()) }
+        yaccFile.rules.forEach { (t, u) -> println(t.toString() + "\t" + (u ?: "")) }
     }
 
     @Test

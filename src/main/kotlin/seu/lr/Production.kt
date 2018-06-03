@@ -9,6 +9,8 @@ package seu.lr
 class Production(val leftSymbol: Symbol, val rightSymbols: ArrayList<Symbol>) {
 
     override fun toString(): String {
-        return "Production($leftSymbol -> $rightSymbols)"
+        return "$leftSymbol -> $rightSymbols".replace("[", "")
+                .replace("]", "")
+                .replace(",", "")
     }
 }
