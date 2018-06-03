@@ -10,7 +10,7 @@ class LR(rules: List<Production>,
      */
     init {
         if (!non_terminals.contains(start)) throw Error("Definition Error - Unknown start")
-        productions.add(Production("", start))
+//        productions.add(Production("", start))
         start = ""
     }
 

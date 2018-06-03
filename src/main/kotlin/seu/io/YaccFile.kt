@@ -1,6 +1,7 @@
 package seu.io
 
 import seu.lr.Production
+import seu.lr.Symbol
 import java.io.BufferedReader
 import java.io.FileReader
 
@@ -12,9 +13,6 @@ class YaccFile(filePath: String) {
     var instructions: HashMap<String, String> = HashMap()
     var rules: HashMap<Production, String?> = HashMap()
     var userSeg: StringBuffer = StringBuffer()
-
-    private var terminals: HashSet<String> = HashSet()
-    private var nonTerminals: HashSet<String> = HashSet()
 
     init {
         readInstructions()
@@ -35,7 +33,6 @@ class YaccFile(filePath: String) {
                             .filter { s: String -> s.isNotEmpty() }
                             .forEach { s: String ->
                                 kotlin.run {
-                                    terminals.add(s)
                                     instructions[s] = tag
                                 }
                             }
@@ -86,13 +83,21 @@ class YaccFile(filePath: String) {
                     }
                 }
 
-                if (left.isNullOrEmpty() || right.isEmpty())
+                if (left == null || left.isEmpty() || right.isEmpty())
                     throw Exception("Lex format error - wrong production input")
                 else {
-                    val pro = Production(left!!, right)
+                    val symbols = ArrayList<Symbol>()
+                    right.split(' ')
+                            .filter { s: String -> s.isNotEmpty() }
+                            .forEach { s: String ->
+                                symbols.add(Symbol(
+                                        if (s.startsWith("'") && s.endsWith("'") || instructions.containsKey(s))
+                                            Symbol.TERMINAL
+                                        else
+                                            Symbol.NON_TERMINAL, s))
+                            }
+                    val pro = Production(Symbol(Symbol.NON_TERMINAL, left), symbols)
                     rules[pro] = action
-                    nonTerminals.add(pro.left)
-                    pro.right.forEach { t: String? -> if (t!!.startsWith("'") && t.endsWith("'")) terminals.add(t) }
                 }
             }
         }
