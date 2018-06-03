@@ -72,8 +72,8 @@ class YaccFile(filePath: String) {
                     indexOfLeftBrace = remain.indexOf('{', indexOfLeftBrace + 1)
                 }
 
-                when {
-                    indexOfLeftBrace == -1 -> right = remain
+                when (indexOfLeftBrace) {
+                    -1 -> right = remain
                     else -> {
                         action = remain.substring(indexOfLeftBrace, remain.length).trim()
                         right = remain.substring(0, indexOfLeftBrace - 1).trim()
