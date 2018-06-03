@@ -5,7 +5,7 @@ class LrItem(pro: Production, itemNum: Int, forward: List<String>) {
     private val posOfDot = itemNum
     private val forwardList = forward
 
-    fun moveDot(): LrItem {
+    fun shiftIn(): LrItem {
         if(posOfDot >= production.right.size) throw Error("LrItem Error - dot already reach the end")
         return LrItem(production, posOfDot + 1, forwardList)
     }

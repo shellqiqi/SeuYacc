@@ -1,15 +1,18 @@
 package seu.lr
 
 class LR(rules: List<Production>,
-                  terminals: HashSet<String>, non_terminals: HashSet<String>,
-                  startWith: String) {
-    val CFG: List<Production> = rules
-    val termi: HashSet<String> = terminals
-    val non_termi: HashSet<String> = non_terminals
-    val start: String = startWith
+         val terminals: HashSet<String>, val non_terminals: HashSet<String>,
+         var start: String) {
+    val productions: ArrayList<Production> = rules as ArrayList<Production>
 
+    /**
+     * transfer to augmented grammar
+     */
     init {
-        if (!non_termi.contains(start)) throw Error("Definition Error - Unknown start")
-
+        if (!non_terminals.contains(start)) throw Error("Definition Error - Unknown start")
+        productions.add(Production("", start))
+        start = ""
     }
+
+
 }

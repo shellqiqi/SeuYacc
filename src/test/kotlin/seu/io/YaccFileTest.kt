@@ -1,6 +1,7 @@
 package seu.io
 
 import org.junit.BeforeClass
+import org.junit.Ignore
 import org.junit.Test
 
 class YaccFileTest {
@@ -26,13 +27,14 @@ class YaccFileTest {
     }
 
     @Test
+    @Ignore
     fun readRules() {
         println("rules:")
         yaccFile.rules.forEach { (t, u) -> println(t.toString() + "\t" + u.toString()) }
         println("terminals:")
         yaccFile.terminals.forEach{t -> println(t)}
         println("non-terminals:")
-        yaccFile.non_terminals.forEach{t -> println(t)}
+        yaccFile.nonTerminals.forEach{ t -> println(t)}
     }
 
     @Test

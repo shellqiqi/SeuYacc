@@ -12,7 +12,7 @@ class YaccFile(filePath: String) {
     var instructions: HashMap<String, String> = HashMap()
     var rules: HashMap<Production, String?> = HashMap()
     var terminals: HashSet<String> = HashSet()
-    var non_terminals: HashSet<String> = HashSet()
+    var nonTerminals: HashSet<String> = HashSet()
     var userSeg: StringBuffer = StringBuffer()
 
     init {
@@ -52,8 +52,8 @@ class YaccFile(filePath: String) {
             val lineOfReader = reader.readLine()?.trim() ?: throw Exception("Lex format error - miss user segment")
             if (lineOfReader.startsWith("%%")) return
             else {
-                var remain: String? = null
-                var right: String = ""
+                var remain: String?
+                var right: String
                 var action: String? = null
                 when {
                     lineOfReader.startsWith(";") -> {
@@ -84,8 +84,8 @@ class YaccFile(filePath: String) {
                     throw Exception("Lex format error - wrong production input")
                 else {
                     val pro = Production(left!!, right)
-                    rules.put(pro, action)
-                    non_terminals.add(pro.left)
+                    rules[pro] = action
+                    nonTerminals.add(pro.left)
                     pro.right.forEach { t: String? ->  if(t!!.startsWith("'")&&t.endsWith("'")) terminals.add(t)}
                 }
             }
