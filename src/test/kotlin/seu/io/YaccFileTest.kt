@@ -27,7 +27,12 @@ class YaccFileTest {
 
     @Test
     fun readRules() {
+        println("rules:")
         yaccFile.rules.forEach { (t, u) -> println(t.toString() + "\t" + u.toString()) }
+        println("terminals:")
+        yaccFile.terminals.forEach{t -> println(t)}
+        println("non-terminals:")
+        yaccFile.non_terminals.forEach{t -> println(t)}
     }
 
     @Test

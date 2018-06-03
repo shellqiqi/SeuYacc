@@ -11,6 +11,8 @@ class YaccFile(filePath: String) {
     var headers: StringBuffer = StringBuffer()
     var instructions: HashMap<String, String> = HashMap()
     var rules: HashMap<Production, String?> = HashMap()
+    var terminals: HashSet<String> = HashSet()
+    var non_terminals: HashSet<String> = HashSet()
     var userSeg: StringBuffer = StringBuffer()
 
     init {
@@ -29,6 +31,7 @@ class YaccFile(filePath: String) {
                     val split = lineOfReader.split(' ')
                     val tag = split[0]
                     val token = split[1]
+                    terminals.add(token)
                     instructions[token] = tag
                 }
             }
@@ -79,8 +82,12 @@ class YaccFile(filePath: String) {
 
                 if (left.isNullOrEmpty() || right.isEmpty())
                     throw Exception("Lex format error - wrong production input")
-                else
-                    rules.put(Production(left!!, right), action)
+                else {
+                    val pro = Production(left!!, right)
+                    rules.put(pro, action)
+                    non_terminals.add(pro.left)
+                    pro.right.forEach { t: String? ->  if(t!!.startsWith("'")&&t.endsWith("'")) terminals.add(t)}
+                }
             }
         }
     }
