@@ -1,12 +1,10 @@
 package seu.lr
 
-class LrState(lrItems: HashSet<LrItem>) {
-    val lrItems = lrItems.clone()
+class LrState(lrItems: List<LrItem>) {
+    val lrItems = HashSet(lrItems)
 
-    override fun equals(other: Any?): Boolean {
+    fun equals(other: LrState): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        return true
+        return lrItems == other.lrItems
     }
 }
