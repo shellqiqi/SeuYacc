@@ -33,8 +33,10 @@ class LRTest {
     @Test
     @Ignore
     fun closureTest2() {
-        val item2 = Item(lr2.productions[0], 0, Symbol.END)
+        val item1 = Item(lr2.productions[0], 0, Symbol.END)
+        println(item1.toString())
+        val item2 = Item(lr2.productions[1], 0, Symbol.END)
         println(item2.toString() + '\n')
-        lr2.closure(arrayListOf(item2)).items.forEach { i -> println(i) }
+        lr2.closure(arrayListOf(item1, item2)).items.forEach { i -> println(i) }
     }
 }

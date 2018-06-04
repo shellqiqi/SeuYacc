@@ -9,6 +9,9 @@ package seu.lr
  */
 class Item(val production: Production, val position: Int, val forward: Symbol) {
 
+    val next = getNextSymbol()
+    val nextNext = getNextNextSymbol()
+
     /**
      * Create a new item with its dot move forward, or Null if the dot reaches the end
      * for example
@@ -35,7 +38,7 @@ class Item(val production: Production, val position: Int, val forward: Symbol) {
      * given S -> A.BC , we get a B;
      * given S -> ABC. , we get Null.
      */
-    fun getNext(): Symbol? {
+    fun getNextSymbol(): Symbol? {
         return if (hasNext()) production.rightSymbols[position] else null
     }
 
@@ -43,21 +46,21 @@ class Item(val production: Production, val position: Int, val forward: Symbol) {
      * If you have understood the meaning of last function, you should know this;
      * If not, go back to see.
      */
-    fun getNextNext(): Symbol? {
+    fun getNextNextSymbol(): Symbol? {
         return if (hasNextNext()) production.rightSymbols[position + 1] else null
     }
 
     /**
      * @return whether there are symbols left after the dot.
      */
-    fun hasNext(): Boolean {
+    private fun hasNext(): Boolean {
         return position < production.rightSymbols.size
     }
 
     /**
      * @return whether there are more than one symbols after the dot.
      */
-    fun hasNextNext(): Boolean {
+    private fun hasNextNext(): Boolean {
         return position + 1 < production.rightSymbols.size
     }
 
