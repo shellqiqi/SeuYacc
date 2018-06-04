@@ -74,13 +74,7 @@ class LR(rules: List<Production>, start: String) {
         symbolStack.addAll(startState.getNext())
 
         while (!symbolStack.empty()) {
-            if (symbolStack.peek() == Symbol.START) { // TODO: Never reach here
-                symbolStack.pop()
-                val acceptState = closure(startState.shiftIn(Symbol.START))
-                parsingTable.initState(acceptState)
-                parsingTable[acceptState, Symbol.END] = ParsingTable.Entry(ParsingTable.Entry.ACCEPT, null)
-            } else
-                fillParsingTable(startState, symbolStack.pop())
+            fillParsingTable(startState, symbolStack.pop())
         }
     }
 
@@ -95,7 +89,12 @@ class LR(rules: List<Production>, start: String) {
 
         val reducibleItems = newState.getReducible()
         reducibleItems.forEach { item ->
-            parsingTable[newState, item.forward] = ParsingTable.Entry(ParsingTable.Entry.REDUCE, item.production)
+            parsingTable[newState, item.forward] =
+                    ParsingTable.Entry(
+                            if (item.production.leftSymbol == Symbol.START)
+                                ParsingTable.Entry.ACCEPT
+                            else
+                                ParsingTable.Entry.REDUCE, item.production)
         }
 
         while (!symbolStack.empty()) {
