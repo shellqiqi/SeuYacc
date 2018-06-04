@@ -31,6 +31,4 @@ class Production(val leftSymbol: Symbol, val rightSymbols: ArrayList<Symbol>) {
         result = 31 * result + rightSymbols.hashCode()
         return result
     }
-
-
 }

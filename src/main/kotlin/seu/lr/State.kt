@@ -41,7 +41,7 @@ class State(items: List<Item>) {
     }
 
     override fun toString(): String {
-        return "State(items=${items.toList()})"
+        return "State${items.toList()}"
     }
 
     override fun equals(other: Any?): Boolean {

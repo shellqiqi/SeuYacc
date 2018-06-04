@@ -47,7 +47,8 @@ class LRTest {
 
     @Test
     fun test() {
-        lr3.parsingTable.table.forEach { (t, u) -> println(t) }
+        println(lr3.parsingTable)
+//        lr3.parsingTable.table.forEach { (t, u) -> println(t) }
     }
 
 }

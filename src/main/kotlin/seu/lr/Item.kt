@@ -89,12 +89,13 @@ class Item(val production: Production, val position: Int, val forward: Symbol) {
     }
 
     override fun toString(): String {
-        var right1 = ""
-        for (i in 0 until position)
-            right1 += production.rightSymbols[i].name + " "
-        var right2 = ""
-        for (i in position until production.rightSymbols.size)
-            right2 += production.rightSymbols[i].name + " "
-        return "Item(${production.leftSymbol} -> $right1. $right2\t$forward)"
+        val stringBuilder = StringBuilder()
+        stringBuilder.append("${production.leftSymbol} →")
+        for (index in 0 until position)
+            stringBuilder.append(" ${production.rightSymbols[index]}")
+        stringBuilder.append(" ·")
+        for (index in position .. production.rightSymbols.lastIndex)
+            stringBuilder.append(" ${production.rightSymbols[index]}")
+        return "Item($stringBuilder‖$forward)"
     }
 }

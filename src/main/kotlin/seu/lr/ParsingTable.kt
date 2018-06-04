@@ -46,4 +46,21 @@ class ParsingTable {
     fun hasState(state: State): Boolean {
         return table.containsKey(state)
     }
+
+    override fun toString(): String {
+        val stringBuilder = StringBuilder()
+        for ((state, row) in table.entries) {
+            stringBuilder.append(state)
+            for ((symbol, entry) in row) {
+                stringBuilder.append("\n\t$symbol ┆ ${when (entry.label) {
+                    Entry.REDUCE -> "reduce"
+                    Entry.ACCEPT -> "accept"
+                    Entry.SHIFT -> "shift-in"
+                    else -> throw Exception("Unknown label in ParsingTable.Entry")
+                }} ┆ ${entry.target}")
+            }
+            stringBuilder.append('\n')
+        }
+        return "ParsingTable\n$stringBuilder"
+    }
 }
