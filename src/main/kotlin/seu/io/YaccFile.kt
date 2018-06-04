@@ -11,7 +11,7 @@ class YaccFile(filePath: String) {
 
     var headers = StringBuffer()
     var tokens = HashSet<String>()
-    lateinit var start: String
+    lateinit var start: Symbol
     var rules = HashMap<Production, String?>()
     var userSeg = StringBuffer()
 
@@ -33,7 +33,8 @@ class YaccFile(filePath: String) {
                     when (tag) {
                         "%token" -> split.subList(1, split.size)
                                 .forEach { s: String -> tokens.add(s) }
-                        "%start" -> start = split.getOrNull(1) ?: throw Exception("Lex format error - lost definition after %start")
+                        "%start" -> start = Symbol(Symbol.NON_TERMINAL, split.getOrNull(1)
+                                ?: throw Exception("Lex format error - lost definition after %start"))
                     }
                 }
             }

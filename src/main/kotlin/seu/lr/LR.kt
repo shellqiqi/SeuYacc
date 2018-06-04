@@ -2,7 +2,7 @@ package seu.lr
 
 import java.util.*
 
-class LR(rules: List<Production>, start: String) {
+class LR(rules: List<Production>, start: Symbol) {
     /* context free grammar stuff */
     val productions: ArrayList<Production> = rules as ArrayList<Production>
     val parsingTable = ParsingTable()
@@ -16,8 +16,8 @@ class LR(rules: List<Production>, start: String) {
     /**
      * transfer to augmented grammar
      */
-    private fun toAugment(start: String) {
-        startProduction = Production(Symbol.START, arrayListOf(Symbol(Symbol.NON_TERMINAL, start)))
+    private fun toAugment(start: Symbol) {
+        startProduction = Production(Symbol.START, arrayListOf(start))
         productions.add(startProduction)
     }
 

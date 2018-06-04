@@ -3,6 +3,7 @@ package seu.io
 import org.junit.BeforeClass
 import org.junit.Ignore
 import org.junit.Test
+import seu.lr.Symbol
 import kotlin.test.assertEquals
 
 class YaccFileTest {
@@ -27,7 +28,7 @@ class YaccFileTest {
         tokens.add("DIGIT")
         tokens.add("HELLO")
         assertEquals(tokens, yaccFile.tokens)
-        assertEquals("line", yaccFile.start)
+        assertEquals(Symbol(Symbol.NON_TERMINAL, "line"), yaccFile.start)
     }
 
     @Test
