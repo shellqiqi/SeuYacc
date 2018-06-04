@@ -3,28 +3,31 @@ package seu.io
 import org.junit.BeforeClass
 import org.junit.Ignore
 import org.junit.Test
+import kotlin.test.assertEquals
 
 class YaccFileTest {
 
     companion object {
         private lateinit var yaccFile: YaccFile
         @BeforeClass
-        @JvmStatic fun constructor() {
+        @JvmStatic
+        fun constructor() {
             yaccFile = YaccFile("resource/example.y")
         }
     }
 
     @Test
     fun readHeaders() {
-        kotlin.test.assertEquals("#include <ctype.h>\n", yaccFile.headers.toString())
+        assertEquals("#include <ctype.h>\n", yaccFile.headers.toString())
     }
 
     @Test
     fun readInstructions() {
-        val instructions: HashMap<String, String> = HashMap()
-        instructions["DIGIT"] = "%token"
-        instructions["HELLO"] = "%token"
-        kotlin.test.assertEquals(instructions, yaccFile.instructions)
+        val tokens: HashSet<String> = HashSet()
+        tokens.add("DIGIT")
+        tokens.add("HELLO")
+        assertEquals(tokens, yaccFile.tokens)
+        assertEquals("line", yaccFile.start)
     }
 
     @Test
@@ -36,7 +39,7 @@ class YaccFileTest {
 
     @Test
     fun readUserSeg() {
-        kotlin.test.assertEquals("""
+        assertEquals("""
         yylex() {
             int c;
             c = getchar();

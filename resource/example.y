@@ -2,6 +2,7 @@
 #include <ctype.h>
 %}
 %token DIGIT  HELLO
+%start  line
 %%
 line   : expr '\n'        { printf("%d\n", $1); }
        ;

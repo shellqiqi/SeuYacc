@@ -2,6 +2,7 @@
 #include <ctype.h>
 %}
 %token c d
+%start S
 %%
 S   : C C
     ;

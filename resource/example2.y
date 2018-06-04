@@ -2,6 +2,7 @@
 #include <ctype.h>
 %}
 %token and or b
+%start E
 %%
 E   : E and F
     | F

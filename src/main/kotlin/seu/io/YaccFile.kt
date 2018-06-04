@@ -9,10 +9,11 @@ class YaccFile(filePath: String) {
 
     private var reader: BufferedReader = BufferedReader(FileReader(filePath))
 
-    var headers: StringBuffer = StringBuffer()
-    var instructions: HashMap<String, String> = HashMap()
-    var rules: HashMap<Production, String?> = HashMap()
-    var userSeg: StringBuffer = StringBuffer()
+    var headers = StringBuffer()
+    var tokens = HashSet<String>()
+    lateinit var start: String
+    var rules = HashMap<Production, String?>()
+    var userSeg = StringBuffer()
 
     init {
         readInstructions()
@@ -27,15 +28,13 @@ class YaccFile(filePath: String) {
                 lineOfReader.startsWith("%%") -> return
                 lineOfReader.startsWith("%{") -> readHeaders()
                 else -> {
-                    val split = lineOfReader.split(' ')
-                    val tag = split[0]
-                    split.subList(1, split.size)
-                            .filter { s: String -> s.isNotEmpty() }
-                            .forEach { s: String ->
-                                kotlin.run {
-                                    instructions[s] = tag
-                                }
-                            }
+                    val split = lineOfReader.split(' ').filter { s: String -> s.isNotEmpty() }
+                    val tag = split.first()
+                    when (tag) {
+                        "%token" -> split.subList(1, split.size)
+                                .forEach { s: String -> tokens.add(s) }
+                        "%start" -> start = split.getOrNull(1) ?: throw Exception("Lex format error - lost definition after %start")
+                    }
                 }
             }
         }
@@ -91,7 +90,7 @@ class YaccFile(filePath: String) {
                             .filter { s: String -> s.isNotEmpty() }
                             .forEach { s: String ->
                                 symbols.add(Symbol(
-                                        if (s.startsWith("'") && s.endsWith("'") || instructions.containsKey(s))
+                                        if (s.startsWith("'") && s.endsWith("'") || tokens.contains(s))
                                             Symbol.TERMINAL
                                         else
                                             Symbol.NON_TERMINAL, s))
