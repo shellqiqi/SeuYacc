@@ -11,6 +11,7 @@ class ParsingTableTest {
     companion object {
         private lateinit var state1: State
         private lateinit var state2: State
+        private lateinit var state3: State
         private lateinit var production: Production
         private var table = ParsingTable()
         @BeforeClass
@@ -21,6 +22,7 @@ class ParsingTableTest {
             val item1 = Item(lr.productions[5], 0, Symbol.END)
             val item2 = Item(lr.productions[4], 1, Symbol.END)
             state1 = lr.closure(arrayListOf(item1))
+            state3 = lr.closure(arrayListOf(item1))
             state2 = lr.closure(arrayListOf(item2))
             production = lr.productions[0]
         }
@@ -28,6 +30,8 @@ class ParsingTableTest {
 
     @Test
     fun getAndSetTest() {
+        table.initState(state1)
+        table.initState(state2)
         table[state1, Symbol(Symbol.NON_TERMINAL, "E")] =
                 ParsingTable.Entry(ParsingTable.Entry.SHIFT, state2)
         table[state1, Symbol(Symbol.TERMINAL, "F")] =
@@ -46,5 +50,11 @@ class ParsingTableTest {
         assertEquals(
                 null,
                 table[state1, Symbol(Symbol.TERMINAL, "E")])
+    }
+
+    @Test
+    fun hasStateTest() {
+        table.initState(state1)
+        assert(table.hasState(state3))
     }
 }

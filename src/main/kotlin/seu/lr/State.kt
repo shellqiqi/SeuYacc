@@ -19,6 +19,10 @@ class State(items: List<Item>) {
         return result.toList()
     }
 
+    fun getReducible(): List<Item> {
+        return items.filter { i -> i.reachEnd() }
+    }
+
     /**
      * Make each of item shift in if its next matches the input symbol
      *
@@ -38,5 +42,20 @@ class State(items: List<Item>) {
 
     override fun toString(): String {
         return "State(items=${items.toList()})"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as State
+
+        if (items != other.items) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return items.hashCode()
     }
 }

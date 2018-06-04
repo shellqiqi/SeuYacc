@@ -12,13 +12,18 @@ class LRTest {
     companion object {
         private lateinit var lr1: LR
         private lateinit var lr2: LR
+        private lateinit var lr3: LR
         @BeforeClass
         @JvmStatic
         fun constructor() {
             val yaccFile1 = YaccFile("resource/example.y")
             val yaccFile2 = YaccFile("resource/example2.y")
-            lr1 = LR(yaccFile1.rules.keys.toList(), "")
-            lr2 = LR(yaccFile2.rules.keys.toList(), "")
+            val yaccFile3 = YaccFile("resource/example3.y")
+
+//            lr1 = LR(yaccFile1.rules.keys.toList(), "line")
+//            lr2 = LR(yaccFile2.rules.keys.toList(), "E")
+            lr3 = LR(yaccFile3.rules.keys.toList(), "S")
+
         }
     }
 
@@ -39,4 +44,10 @@ class LRTest {
         println(item2.toString() + '\n')
         lr2.closure(arrayListOf(item1, item2)).items.forEach { i -> println(i) }
     }
+
+    @Test
+    fun test() {
+        lr3.parsingTable.table.forEach { (t, u) -> println(t) }
+    }
+
 }

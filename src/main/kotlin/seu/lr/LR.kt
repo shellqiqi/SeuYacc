@@ -1,10 +1,13 @@
 package seu.lr
 
+import java.util.*
+
 class LR(rules: List<Production>, start: String) {
     /* context free grammar stuff */
     val productions: ArrayList<Production> = rules as ArrayList<Production>
     val parsingTable = ParsingTable()
     lateinit var startProduction: Production
+
     init {
         toAugment(start)
         fillParsingTable()
@@ -64,6 +67,39 @@ class LR(rules: List<Production>, start: String) {
     }
 
     fun fillParsingTable() {
+        val startState = closure(arrayListOf(Item(startProduction, 0, Symbol.END)))
+        parsingTable.initState(startState)
 
+        val symbolStack = Stack<Symbol>()
+        symbolStack.addAll(startState.getNext())
+
+        while (!symbolStack.empty()) {
+            if (symbolStack.peek() == Symbol.START) {
+                symbolStack.pop()
+                val acceptState = closure(startState.shiftIn(Symbol.START))
+                parsingTable.initState(acceptState)
+                parsingTable[acceptState, Symbol.END] = ParsingTable.Entry(ParsingTable.Entry.ACCEPT, null)
+            } else
+                fillParsingTable(startState, symbolStack.pop())
+        }
+    }
+
+    fun fillParsingTable(parent: State, symbol: Symbol) {
+        val newState = closure(parent.shiftIn(symbol))
+        val symbolStack = Stack<Symbol>()
+        if (!parsingTable.hasState(newState)) {
+            parsingTable.initState(newState)
+            symbolStack.addAll(newState.getNext())
+        }
+        parsingTable[parent, symbol] = ParsingTable.Entry(ParsingTable.Entry.SHIFT, newState)
+
+        val reducibleItems = newState.getReducible()
+        reducibleItems.forEach { item ->
+            parsingTable[newState, item.forward] = ParsingTable.Entry(ParsingTable.Entry.REDUCE, item.production)
+        }
+
+        while (!symbolStack.empty()) {
+            fillParsingTable(newState, symbolStack.pop())
+        }
     }
 }

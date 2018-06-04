@@ -64,6 +64,10 @@ class Item(val production: Production, val position: Int, val forward: Symbol) {
         return position + 1 < production.rightSymbols.size
     }
 
+    fun reachEnd(): Boolean {
+        return position == production.rightSymbols.size
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
