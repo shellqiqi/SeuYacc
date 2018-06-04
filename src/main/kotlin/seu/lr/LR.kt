@@ -74,7 +74,7 @@ class LR(rules: List<Production>, start: String) {
         symbolStack.addAll(startState.getNext())
 
         while (!symbolStack.empty()) {
-            if (symbolStack.peek() == Symbol.START) {
+            if (symbolStack.peek() == Symbol.START) { // TODO: Never reach here
                 symbolStack.pop()
                 val acceptState = closure(startState.shiftIn(Symbol.START))
                 parsingTable.initState(acceptState)

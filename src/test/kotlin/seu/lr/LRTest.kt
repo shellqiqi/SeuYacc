@@ -20,8 +20,8 @@ class LRTest {
             val yaccFile2 = YaccFile("resource/example2.y")
             val yaccFile3 = YaccFile("resource/example3.y")
 
-//            lr1 = LR(yaccFile1.rules.keys.toList(), "line")
-//            lr2 = LR(yaccFile2.rules.keys.toList(), "E")
+            lr1 = LR(yaccFile1.rules.keys.toList(), "line")
+            lr2 = LR(yaccFile2.rules.keys.toList(), "E")
             lr3 = LR(yaccFile3.rules.keys.toList(), "S")
 
         }
@@ -46,9 +46,20 @@ class LRTest {
     }
 
     @Test
-    fun test() {
-        println(lr3.parsingTable)
-//        lr3.parsingTable.table.forEach { (t, u) -> println(t) }
+    @Ignore
+    fun testLr1() {
+        println(lr1.parsingTable)
     }
 
+    @Test
+    @Ignore
+    fun testLr2() {
+        println(lr2.parsingTable)
+    }
+
+    @Test
+    @Ignore
+    fun testLr3() {
+        println(lr3.parsingTable)
+    }
 }
