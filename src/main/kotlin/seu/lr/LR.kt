@@ -7,7 +7,7 @@ class LR(rules: List<Production>, start: String) {
     lateinit var startProduction: Production
     init {
         toAugment(start)
-        items()
+        fillParsingTable()
     }
 
     /**
@@ -63,7 +63,7 @@ class LR(rules: List<Production>, start: String) {
         return result
     }
 
-    fun items() {
+    fun fillParsingTable() {
 
     }
 }

@@ -35,7 +35,15 @@ class ParsingTable {
     }
 
     operator fun set(state: State, symbol: Symbol, value: Entry) {
-        if (table[state] == null) table[state] = HashMap()
+        if (table[state] == null) throw Exception("Parsing table error - Missing state.")
         table[state]?.set(symbol, value)
+    }
+
+    fun initState(state: State) {
+        table[state] = HashMap()
+    }
+
+    fun hasState(state: State): Boolean {
+        return table.containsKey(state)
     }
 }
