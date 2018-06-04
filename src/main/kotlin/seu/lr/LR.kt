@@ -1,18 +1,21 @@
 package seu.lr
 
-class LR(rules: List<Production>, var start: String) {
+class LR(rules: List<Production>, start: String) {
     /* context free grammar stuff */
     val productions: ArrayList<Production> = rules as ArrayList<Production>
-
+    val parsingTable = ParsingTable()
+    lateinit var startProduction: Production
     init {
-        toAugment()
+        toAugment(start)
+        items()
     }
 
     /**
      * transfer to augmented grammar
      */
-    private fun toAugment() {
-
+    private fun toAugment(start: String) {
+        startProduction = Production(Symbol.START, arrayListOf(Symbol(Symbol.NON_TERMINAL, start)))
+        productions.add(startProduction)
     }
 
     /**
@@ -60,4 +63,7 @@ class LR(rules: List<Production>, var start: String) {
         return result
     }
 
+    fun items() {
+
+    }
 }

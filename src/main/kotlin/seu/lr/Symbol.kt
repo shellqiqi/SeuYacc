@@ -5,6 +5,7 @@ class Symbol(val label :Int, val name :String) {
         const val TERMINAL = 0
         const val NON_TERMINAL = 1
         val END = Symbol(TERMINAL, "$$")
+        val START = Symbol(NON_TERMINAL, "##")
     }
 
     fun isTerminal(): Boolean {
