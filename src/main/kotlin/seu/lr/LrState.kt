@@ -7,4 +7,10 @@ class LrState(lrItems: List<LrItem>) {
         if (this === other) return true
         return lrItems == other.lrItems
     }
+
+    override fun toString(): String {
+        return "LrState(lrItems=${lrItems.toList()})"
+    }
+
+
 }

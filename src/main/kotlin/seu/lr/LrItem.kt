@@ -43,7 +43,7 @@ class LrItem(val production: Production, val position: Int, val forward: Symbol)
      * If you have understood the meaning of last function, you should know this;
      * If not, go back to see.
      */
-    fun getNextNext(): Symbol?{
+    fun getNextNext(): Symbol? {
         return if (hasNextNext()) production.rightSymbols[position + 1] else null
     }
 
@@ -79,5 +79,15 @@ class LrItem(val production: Production, val position: Int, val forward: Symbol)
         result = 31 * result + position
         result = 31 * result + forward.hashCode()
         return result
+    }
+
+    override fun toString(): String {
+        var right1 = ""
+        for (i in 0 until position)
+            right1 += production.rightSymbols[i].name + " "
+        var right2 = ""
+        for (i in position until production.rightSymbols.size)
+            right2 += production.rightSymbols[i].name + " "
+        return "LrItem(${production.leftSymbol} -> $right1. $right2\t$forward)"
     }
 }
