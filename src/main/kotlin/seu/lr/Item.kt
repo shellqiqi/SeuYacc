@@ -1,13 +1,13 @@
 package seu.lr
 
 /**
- * Item of an LrState
+ * Item of an State
  *
  * @param production a production like S -> CC, further information can be found in class Production
  * @param position the position of dot, from 0 to size of production's rightSymbols
  * @param forward next symbol we might meet after the present lrItem reduced
  */
-class LrItem(val production: Production, val position: Int, val forward: Symbol) {
+class Item(val production: Production, val position: Int, val forward: Symbol) {
 
     /**
      * Create a new item with its dot move forward, or Null if the dot reaches the end
@@ -17,9 +17,9 @@ class LrItem(val production: Production, val position: Int, val forward: Symbol)
      *
      * @return an item with its dot move forward
      */
-    fun shiftIn(): LrItem {
-        if (!hasNext()) throw Error("LrItem Error - dot already reach the end")
-        return LrItem(production, position + 1, forward)
+    fun shiftIn(): Item {
+        if (!hasNext()) throw Error("Item Error - dot already reach the end")
+        return Item(production, position + 1, forward)
     }
 
     /**
@@ -65,7 +65,7 @@ class LrItem(val production: Production, val position: Int, val forward: Symbol)
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as LrItem
+        other as Item
 
         if (production != other.production) return false
         if (position != other.position) return false
@@ -88,6 +88,6 @@ class LrItem(val production: Production, val position: Int, val forward: Symbol)
         var right2 = ""
         for (i in position until production.rightSymbols.size)
             right2 += production.rightSymbols[i].name + " "
-        return "LrItem(${production.leftSymbol} -> $right1. $right2\t$forward)"
+        return "Item(${production.leftSymbol} -> $right1. $right2\t$forward)"
     }
 }

@@ -15,29 +15,29 @@ class LR(rules: List<Production>, var start: String) {
 
     }
 
-    fun closure(lrItems: List<LrItem>): LrState {
-        val items = ArrayList(lrItems)
-        var iterator = 0
+    fun closure(itemList: List<Item>): State {
+        val items = ArrayList(itemList)
+        var index = 0
         while (true) {
-            if (items.size <= iterator)
+            if (items.size <= index)
                 break
-            val item = items[iterator++]
+            val item = items[index++]
             val next = item.getNext()
             if (next?.isTerminal() != false) continue
             for (production in productions) {
                 if (production.leftSymbol == next)
-                    for (forwardSymbol in first(item.getNextNext(), item.forward)){
-                        val newItem = LrItem(production, 0, forwardSymbol)
-                        if(!items.contains(newItem))
+                    for (forwardSymbol in first(item.getNextNext(), item.forward)) {
+                        val newItem = Item(production, 0, forwardSymbol)
+                        if (!items.contains(newItem))
                             items.add(newItem)
                     }
             }
         }
-        return LrState(items)
+        return State(items)
     }
 
     private fun first(next: Symbol?, nextNext: Symbol): List<Symbol> {
-        var result: ArrayList<Symbol> = arrayListOf()
+        val result: ArrayList<Symbol> = arrayListOf()
         val symbol = next ?: nextNext
         if (symbol.isTerminal()) result.add(symbol)
         else {
