@@ -9,9 +9,9 @@ class State(items: List<Item>) {
     val items = HashSet(items)
 
     /**
-     * Get next of each item if it has
+     * Get next of each item if it has.
      *
-     * @return a list of symbol
+     * @return a list of symbols.
      */
     fun getNext(): List<Symbol> {
         val result = HashSet<Symbol>()
@@ -19,25 +19,25 @@ class State(items: List<Item>) {
         return result.toList()
     }
 
+    /**
+     * Get items that can be reduced.
+     *
+     * @return a list of items.
+     */
     fun getReducible(): List<Item> {
         return items.filter { i -> i.reachEnd() }
     }
 
     /**
-     * Make each of item shift in if its next matches the input symbol
+     * Make each of item shift in if its next matches the input symbol.
      *
-     * @param symbol the symbol to be matched
-     * @return a list of items after shifting in
+     * @param symbol the symbol to be matched.
+     * @return a list of items after shifting in.
      */
     fun shiftIn(symbol: Symbol): List<Item> {
         val result = arrayListOf<Item>()
         items.forEach { i -> if (i.next == symbol) result.add(i.shiftIn()) }
         return result
-    }
-
-    fun equals(other: State): Boolean {
-        if (this === other) return true
-        return items == other.items
     }
 
     override fun toString(): String {
