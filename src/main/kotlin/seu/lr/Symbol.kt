@@ -1,6 +1,14 @@
 package seu.lr
 
-class Symbol(val label :Int, val name :String) {
+/**
+ * Construct a symbol with label and its name.
+ * Label describes whether the symbol is a terminal symbol or a non-terminal symbol.
+ * In addition, we define END and START for convenient.
+ *
+ * @param label terminal or non-terminal.
+ * @param name what it calls.
+ */
+class Symbol(val label: Int, val name: String) {
     companion object {
         const val TERMINAL = 0
         const val NON_TERMINAL = 1
