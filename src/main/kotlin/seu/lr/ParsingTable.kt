@@ -1,9 +1,23 @@
 package seu.lr
 
 class ParsingTable {
-
+    /* ┌─────┬────────────────────┬┄ *
+     * │     │       Symbol       │  *
+     * ├─────┼────────────────────┼┄ *
+     * │State│Entry(label, target)│  *
+     * ├─────┼────────────────────┼┄ */
     val table = HashMap<State, HashMap<Symbol, Entry>>()
 
+    /**
+     * Entry of parsing table. It stores an action and its target.
+     * Actions can be shift-in, reduce and accept. Targets can be a state, a production or nothing like null.
+     * Shift-in and move to state.
+     * Reduce according to the production.
+     * Accept with no target.
+     *
+     * @param label action should be taken
+     * @param target a state, a production or null. It depends on the label.
+     */
     class Entry(val label: Int, val target: Any?) {
         companion object {
             const val SHIFT = 0
@@ -30,19 +44,45 @@ class ParsingTable {
         }
     }
 
+    /**
+     * Get the entry of the parsing table.
+     *
+     * @param state state.
+     * @param symbol symbol.
+     * @return entry if exist, else null.
+     */
     operator fun get(state: State, symbol: Symbol): Entry? {
         return table[state]?.get(symbol)
     }
 
+    /**
+     * Set the entry if the state exists in the parsing table, else throws an exception.
+     *
+     * @param state state.
+     * @param symbol symbol.
+     * @param value entry.
+     * @throws Exception missing state in parsing table.
+     */
     operator fun set(state: State, symbol: Symbol, value: Entry) {
         if (table[state] == null) throw Exception("Parsing table error - Missing state.")
         table[state]?.set(symbol, value)
     }
 
+    /**
+     * Init a state. If state exists, clear it.
+     *
+     * @param state state to init.
+     */
     fun initState(state: State) {
         table[state] = HashMap()
     }
 
+    /**
+     * Whether the state exists in the parsing table.
+     *
+     * @param state state to test.
+     * @return
+     */
     fun hasState(state: State): Boolean {
         return table.containsKey(state)
     }
