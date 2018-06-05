@@ -64,6 +64,9 @@ class Item(val production: Production, val position: Int, val forward: Symbol) {
         return position + 1 < production.rightSymbols.size
     }
 
+    /**
+     * @return whether the dot reach the end.
+     */
     fun reachEnd(): Boolean {
         return position == production.rightSymbols.size
     }
@@ -94,7 +97,7 @@ class Item(val production: Production, val position: Int, val forward: Symbol) {
         for (index in 0 until position)
             stringBuilder.append(" ${production.rightSymbols[index]}")
         stringBuilder.append(" ·")
-        for (index in position .. production.rightSymbols.lastIndex)
+        for (index in position..production.rightSymbols.lastIndex)
             stringBuilder.append(" ${production.rightSymbols[index]}")
         return "Item($stringBuilder‖$forward)"
     }
