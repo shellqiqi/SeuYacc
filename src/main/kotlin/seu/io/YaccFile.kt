@@ -5,14 +5,25 @@ import seu.lr.Symbol
 import java.io.BufferedReader
 import java.io.FileReader
 
+/**
+ * Construct YaccFile by given path.
+ * It split file into several segments for further processing.
+ *
+ * @param filePath where yacc file is.
+ */
 class YaccFile(filePath: String) {
 
     private var reader: BufferedReader = BufferedReader(FileReader(filePath))
 
+    /* Segment before the first %% */
     var headers = StringBuffer()
+    /* Terminal symbols defined by %token */
     var tokens = HashSet<String>()
+    /* The start symbol defined by %start */
     lateinit var start: Symbol
+    /* Rules defined between %% */
     var rules = HashMap<Production, String?>()
+    /* Segment after the last %% */
     var userSeg = StringBuffer()
 
     init {
@@ -21,6 +32,10 @@ class YaccFile(filePath: String) {
         readUserSeg()
     }
 
+    /**
+     * Read instructions like %start and %token.
+     * Segment between %{ and %} should be reserved.
+     */
     private fun readInstructions() {
         while (true) {
             val lineOfReader = reader.readLine() ?: throw Exception("Lex format error - miss macro definitions")
@@ -41,6 +56,9 @@ class YaccFile(filePath: String) {
         }
     }
 
+    /**
+     * Read segment between %{ and %}
+     */
     private fun readHeaders() {
         while (true) {
             val lineOfReader = reader.readLine() ?: throw Exception("Lex format error - miss another \"%}\"")
