@@ -34,10 +34,10 @@ class LR(rules: List<Production>, start: Symbol) {
     /**
      * Calculate the closure of each item in Items.
      * For example,
-     * given item A -> α.Bβ, a (B is a non-terminal symbol)
-     * add B -> .stuff , First(βa) to closure.
+     * given item A -> α·B β, a (B is a non-terminal symbol)
+     * add B -> ·stuff , First(β a) to closure.
      * Repeat the operation for each item, include those you add in the process
-     * P.S. First(βa) refer to the symbol you might meet after you reduce current item
+     * P.S. First(β a) refer to the symbol you might meet after you reduce current item
      *
      * @param itemList a list of items to be calculate
      * @return a State with items contain itemList and its closure
@@ -46,11 +46,10 @@ class LR(rules: List<Production>, start: Symbol) {
         val items = ArrayList(itemList)
         var index = 0
         while (true) {
-            if (items.size <= index)
-                break
+            if (items.size <= index) break
             val item = items[index++]
-            val next = item.next
-            if (next?.isTerminal() != false) continue
+            val next = item.next ?: continue
+            if (next.isTerminal()) continue
             for (production in productions) {
                 if (production.leftSymbol == next)
                     for (forwardSymbol in first(item.nextNext, item.forward)) {
@@ -63,6 +62,13 @@ class LR(rules: List<Production>, start: Symbol) {
         return State(items)
     }
 
+    /**
+     * Get First(β a) in A -> α·B β, a.
+     *
+     * @param next β, following symbol.
+     * @param nextNext a, terminal symbol.
+     * @return First(β a), a list of Symbol.
+     */
     private fun first(next: Symbol?, nextNext: Symbol): List<Symbol> {
         val result: ArrayList<Symbol> = arrayListOf()
         val symbol = next ?: nextNext
@@ -76,6 +82,9 @@ class LR(rules: List<Production>, start: Symbol) {
         return result
     }
 
+    /**
+     * Generate a complete parsing table.
+     */
     fun fillParsingTable() {
         val startState = closure(arrayListOf(Item(startProduction, 0, Symbol.END)))
         parsingTable.initState(startState)
@@ -83,10 +92,16 @@ class LR(rules: List<Production>, start: Symbol) {
         val symbolStack = Stack<Symbol>()
         symbolStack.addAll(startState.getNext())
 
-        while (!symbolStack.empty()) fillParsingTable(startState, symbolStack.pop())
+        while (symbolStack.isNotEmpty()) fillParsingTable(startState, symbolStack.pop())
     }
 
-    fun fillParsingTable(parent: State, symbol: Symbol) {
+    /**
+     * Recursive function.
+     *
+     * @param parent parent state.
+     * @param symbol edge from parent state to the next state
+     */
+    private fun fillParsingTable(parent: State, symbol: Symbol) {
         val newState = closure(parent.shiftIn(symbol))
         val symbolStack = Stack<Symbol>()
         if (!parsingTable.hasState(newState)) {
@@ -104,6 +119,6 @@ class LR(rules: List<Production>, start: Symbol) {
                                 ParsingTable.Entry.REDUCE, item.production)
         }
 
-        while (!symbolStack.empty()) fillParsingTable(newState, symbolStack.pop())
+        while (symbolStack.isNotEmpty()) fillParsingTable(newState, symbolStack.pop())
     }
 }
