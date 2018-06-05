@@ -2,10 +2,18 @@ package seu.lr
 
 import java.util.*
 
+/**
+ * Construct LR and its parsing table by given rules.
+ *
+ * @param rules rules defined in yacc file.
+ * @param start start symbol.
+ */
 class LR(rules: List<Production>, start: Symbol) {
-    /* context free grammar stuff */
+    /* Productions that yacc file defines */
     val productions: ArrayList<Production> = rules as ArrayList<Production>
+    /* Parsing table */
     val parsingTable = ParsingTable()
+    /* The start production */
     lateinit var startProduction: Production
 
     init {
@@ -14,7 +22,9 @@ class LR(rules: List<Production>, start: Symbol) {
     }
 
     /**
-     * transfer to augmented grammar
+     * Transfer to augmented grammar.
+     *
+     * @param start start symbol.
      */
     private fun toAugment(start: Symbol) {
         startProduction = Production(Symbol.START, arrayListOf(start))
@@ -73,9 +83,7 @@ class LR(rules: List<Production>, start: Symbol) {
         val symbolStack = Stack<Symbol>()
         symbolStack.addAll(startState.getNext())
 
-        while (!symbolStack.empty()) {
-            fillParsingTable(startState, symbolStack.pop())
-        }
+        while (!symbolStack.empty()) fillParsingTable(startState, symbolStack.pop())
     }
 
     fun fillParsingTable(parent: State, symbol: Symbol) {
@@ -87,8 +95,7 @@ class LR(rules: List<Production>, start: Symbol) {
         }
         parsingTable[parent, symbol] = ParsingTable.Entry(ParsingTable.Entry.SHIFT, newState)
 
-        val reducibleItems = newState.getReducible()
-        reducibleItems.forEach { item ->
+        newState.getReducible().forEach { item ->
             parsingTable[newState, item.forward] =
                     ParsingTable.Entry(
                             if (item.production.leftSymbol == Symbol.START)
@@ -97,8 +104,6 @@ class LR(rules: List<Production>, start: Symbol) {
                                 ParsingTable.Entry.REDUCE, item.production)
         }
 
-        while (!symbolStack.empty()) {
-            fillParsingTable(newState, symbolStack.pop())
-        }
+        while (!symbolStack.empty()) fillParsingTable(newState, symbolStack.pop())
     }
 }
