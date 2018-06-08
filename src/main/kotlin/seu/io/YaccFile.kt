@@ -37,14 +37,14 @@ class YaccFile(filePath: String) {
      * Segment between %{ and %} should be reserved.
      */
     private fun readInstructions() {
-        while (true) {
+        readLine@ while (true) {
             val lineOfReader = reader.readLine() ?: throw Exception("Lex format error - miss macro definitions")
             when {
                 lineOfReader.startsWith("%%") -> return
                 lineOfReader.startsWith("%{") -> readHeaders()
                 else -> {
                     val split = lineOfReader.split(' ').filter { s: String -> s.isNotEmpty() }
-                    val tag = split.first()
+                    val tag = split.firstOrNull() ?: continue@readLine
                     when (tag) {
                         "%token" -> split.subList(1, split.size)
                                 .forEach { s: String -> tokens.add(s) }
@@ -72,6 +72,7 @@ class YaccFile(filePath: String) {
         lineRead@ while (true) {
             val lineOfReader = reader.readLine()?.trim() ?: throw Exception("Lex format error - miss user segment")
             if (lineOfReader.startsWith("%%")) return
+            if (lineOfReader.isBlank()) continue
             else {
                 var remain: String?
                 var right: String
@@ -83,6 +84,12 @@ class YaccFile(filePath: String) {
                     }
                     lineOfReader.startsWith("|") ->
                         remain = lineOfReader.drop(1).trim()
+                    lineOfReader.startsWith(":") ->
+                        remain = lineOfReader.drop(1).trim()
+                    !lineOfReader.contains(":") -> {
+                        left = lineOfReader
+                        continue@lineRead
+                    }
                     else -> {
                         left = lineOfReader.substringBefore(":").trim()
                         remain = lineOfReader.substringAfter(":").trim()

@@ -62,4 +62,12 @@ class LRTest {
     fun testLr3() {
         println(lr3.parsingTable)
     }
+
+    @Test
+    @Ignore
+    fun testLr4() {
+        val yaccFile4 = YaccFile("resource/example4.y")
+        val lr4 = LR(yaccFile4.rules.keys.toList(), yaccFile4.start)
+        println(lr4.parsingTable.table.size)
+    }
 }
