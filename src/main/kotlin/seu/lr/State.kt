@@ -40,6 +40,11 @@ class State(items: List<Item>) {
         return result
     }
 
+    fun toSimple(): Set<Item>{
+        Item.ignore()//TODO: miss method
+        return HashSet(items)
+    }
+
     override fun toString(): String {
         return "State${items.toList()}"
     }

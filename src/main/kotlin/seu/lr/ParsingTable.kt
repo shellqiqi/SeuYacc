@@ -87,6 +87,23 @@ class ParsingTable {
         return table.containsKey(state)
     }
 
+    fun hasStateAndCombine(state: State): Boolean {
+        val stateSimple = state.toSimple()
+        for ((s, v) in table){
+            if(s.toSimple() == stateSimple){
+                if(s == state)
+                    return true
+                table.remove(state)
+                Item.finishIgnore() //TODO: miss method
+                state.items.addAll(s.items)
+                s.items.addAll(state.items)
+                table[state] = v
+                return true
+            }
+        }
+        return false
+    }
+
     override fun toString(): String {
         val stringBuilder = StringBuilder()
         for ((state, row) in table.entries) {
