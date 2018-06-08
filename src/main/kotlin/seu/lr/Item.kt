@@ -71,6 +71,18 @@ class Item(val production: Production, val position: Int, val forward: Symbol) {
         return position == production.rightSymbols.size
     }
 
+    companion object {
+        private var ignoreForward = false
+        @JvmStatic
+        fun ignore() {
+            ignoreForward = true
+        }
+
+        fun finishIgnore() {
+            ignoreForward = false
+        }
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -79,15 +91,13 @@ class Item(val production: Production, val position: Int, val forward: Symbol) {
 
         if (production != other.production) return false
         if (position != other.position) return false
-        if (forward != other.forward) return false
-
+        if (!ignoreForward) if (forward != other.forward) return false
         return true
     }
 
     override fun hashCode(): Int {
         var result = production.hashCode()
         result = 31 * result + position
-        result = 31 * result + forward.hashCode()
         return result
     }
 

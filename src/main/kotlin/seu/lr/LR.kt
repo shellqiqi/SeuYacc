@@ -1,5 +1,6 @@
 package seu.lr
 
+import com.sun.org.apache.xpath.internal.operations.Bool
 import java.util.*
 
 /**
@@ -8,7 +9,7 @@ import java.util.*
  * @param rules rules defined in yacc file.
  * @param start start symbol.
  */
-class LR(rules: List<Production>, start: Symbol) {
+class LR(rules: List<Production>, start: Symbol, private val lalr: Boolean = false) {
     /* Productions that yacc file defines */
     val productions: ArrayList<Production> = rules as ArrayList<Production>
     /* Parsing table */
@@ -104,7 +105,8 @@ class LR(rules: List<Production>, start: Symbol) {
     private fun fillParsingTable(parent: State, symbol: Symbol) {
         val newState = closure(parent.shiftIn(symbol))
         val symbolStack = Stack<Symbol>()
-        if (!parsingTable.hasState(newState)) {
+        if (if (lalr) !parsingTable.hasStateAndCombine(newState)
+                else !parsingTable.hasState(newState)) {
             parsingTable.initState(newState)
             symbolStack.addAll(newState.getNext())
         }
