@@ -5,6 +5,7 @@ package seu.lr
  *
  * @param leftSymbol A
  * @param rightSymbols Bs
+ * @param action things to do when the production is reduced
  */
 class Production(val leftSymbol: Symbol, val rightSymbols: ArrayList<Symbol>, val action: String?) {
 
