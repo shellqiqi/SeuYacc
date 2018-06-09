@@ -12,7 +12,7 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
     fun writeFile(filePath: String) {
         writer = BufferedWriter(FileWriter(filePath))
         writeHeaders()
-        writer.write(CodeFileUtil(lr).generate())
+        writer.write(generate())
         writeUserSeg()
         writer.close()
     }
@@ -23,5 +23,18 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
 
     private fun writeUserSeg() {
         writer.write(yaccFile.userSeg.toString())
+    }
+
+    fun generate(): String {
+        return include() + '\n'
+    }
+
+    fun include(): String {
+        return """
+            #include <iostream>
+            #include <unordered_map>
+            #include <string>
+            using namespace std;
+        """.trimIndent()
     }
 }
