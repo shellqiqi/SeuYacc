@@ -49,23 +49,26 @@ class LR(rules: List<Production>, start: Symbol) {
      * @return a State with items contain itemList and its closure
      */
     fun closure(itemList: List<Item>): State {
-        val items = LinkedHashSet(itemList)
+        val itemHashSet = HashSet(itemList)
+        val itemArrayList = ArrayList(itemList)
         var index = 0
         while (true) {
-            if (items.size <= index) break
-            val item = items.elementAt(index++)
+            if (itemArrayList.size <= index) break
+            val item = itemArrayList[index++]
             val next = item.next ?: continue
             if (next.isTerminal()) continue
             for (production in productions) {
                 if (production.leftSymbol == next)
                     for (forwardSymbol in first(item.nextNext, item.forward)) {
                         val newItem = Item(production, 0, forwardSymbol)
-                        if (!items.contains(newItem))
-                            items.add(newItem)
+                        if (!itemHashSet.contains(newItem)) {
+                            itemHashSet.add(newItem)
+                            itemArrayList.add(newItem)
+                        }
                     }
             }
         }
-        return State(items.toList())
+        return State(itemArrayList)
     }
 
     /**
