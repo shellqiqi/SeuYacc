@@ -3,7 +3,6 @@ package seu.lr
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
-import kotlin.collections.LinkedHashSet
 
 /**
  * Construct LR and its parsing table by given rules.
@@ -19,11 +18,11 @@ class LR(rules: List<Production>, start: Symbol) {
     /* The start production */
     lateinit var startProduction: Production
 
-    val firstOfNonterminal = HashMap<Symbol, List<Symbol>>()
+    private val firstOfNonTerminal = HashMap<Symbol, List<Symbol>>()
 
     init {
         toAugment(start)
-        productions.forEach { p -> firstOfNonterminal[p.leftSymbol] = firstInit(p.leftSymbol) }
+        productions.forEach { p -> firstOfNonTerminal[p.leftSymbol] = firstInit(p.leftSymbol) }
         fillParsingTable()
     }
 
@@ -81,7 +80,7 @@ class LR(rules: List<Production>, start: Symbol) {
     private fun first(next: Symbol?, nextNext: Symbol): List<Symbol> {
         val symbol = next ?: nextNext
         return if (symbol.isTerminal()) arrayListOf(symbol)
-        else firstOfNonterminal.getValue(symbol)
+        else firstOfNonTerminal.getValue(symbol)
     }
 
     /**
@@ -97,7 +96,7 @@ class LR(rules: List<Production>, start: Symbol) {
         else {
             productions.forEach { production ->
                 if (production.leftSymbol == next)
-                    if(production.rightSymbols[0] != next)
+                    if (production.rightSymbols[0] != next)
                         result.addAll(firstInit(production.rightSymbols[0]))
             }
         }
@@ -107,7 +106,7 @@ class LR(rules: List<Production>, start: Symbol) {
     /**
      * Generate a complete parsing table.
      */
-    fun fillParsingTable() {
+    private fun fillParsingTable() {
         val startState = closure(arrayListOf(Item(startProduction, 0, Symbol.END)))
         parsingTable.initState(startState)
 
