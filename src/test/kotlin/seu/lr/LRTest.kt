@@ -16,14 +16,14 @@ class LRTest {
         @BeforeClass
         @JvmStatic
         fun constructor() {
-            val yaccFile1 = YaccFile("resource/example.y")
+            /*val yaccFile1 = YaccFile("resource/example.y")
             val yaccFile2 = YaccFile("resource/example2.y")
             val yaccFile3 = YaccFile("resource/example3.y")
 
             lr1 = LR(yaccFile1.rules.keys.toList(), yaccFile1.start)
             lr2 = LR(yaccFile2.rules.keys.toList(), yaccFile2.start)
             lr3 = LR(yaccFile3.rules.keys.toList(), yaccFile3.start)
-
+*/
         }
     }
 

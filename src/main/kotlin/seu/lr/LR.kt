@@ -1,7 +1,8 @@
 package seu.lr
 
 import java.util.*
-import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
 /**
  * Construct LR and its parsing table by given rules.
@@ -17,8 +18,11 @@ class LR(rules: List<Production>, start: Symbol) {
     /* The start production */
     lateinit var startProduction: Production
 
+    private val firstOfNonTerminal = HashMap<Symbol, List<Symbol>>()
+
     init {
         toAugment(start)
+        productions.forEach { p -> firstOfNonTerminal[p.leftSymbol] = firstInit(p.leftSymbol) }
         fillParsingTable()
     }
 
@@ -74,23 +78,35 @@ class LR(rules: List<Production>, start: Symbol) {
      * @return First(β a), a list of Symbol.
      */
     private fun first(next: Symbol?, nextNext: Symbol): List<Symbol> {
-        val result: ArrayList<Symbol> = arrayListOf()
         val symbol = next ?: nextNext
-        if (symbol.isTerminal()) result.add(symbol)
+        return if (symbol.isTerminal()) arrayListOf(symbol)
+        else firstOfNonTerminal.getValue(symbol)
+    }
+
+    /**
+     * Get First(β a) in A -> α·B β, a.
+     *
+     * @param next β, following symbol.
+     * @param nextNext a, terminal symbol.
+     * @return First(β a), a list of Symbol.
+     */
+    private fun firstInit(next: Symbol): List<Symbol> {
+        val result: HashSet<Symbol> = HashSet()
+        if (next.isTerminal()) result.add(next)
         else {
             productions.forEach { production ->
-                if (production.leftSymbol == symbol)
-                    if(production.rightSymbols[0] !=symbol)
-                        result.addAll(first(null, production.rightSymbols[0]))
+                if (production.leftSymbol == next)
+                    if (production.rightSymbols[0] != next)
+                        result.addAll(firstInit(production.rightSymbols[0]))
             }
         }
-        return result
+        return result.toList()
     }
 
     /**
      * Generate a complete parsing table.
      */
-    fun fillParsingTable() {
+    private fun fillParsingTable() {
         val startState = closure(arrayListOf(Item(startProduction, 0, Symbol.END)))
         parsingTable.initState(startState)
 
