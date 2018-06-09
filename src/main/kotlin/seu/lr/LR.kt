@@ -77,7 +77,8 @@ class LR(rules: List<Production>, start: Symbol) {
         else {
             productions.forEach { production ->
                 if (production.leftSymbol == symbol)
-                    result.addAll(first(null, production.rightSymbols[0]))
+                    if(production.rightSymbols[0] !=symbol)
+                        result.addAll(first(null, production.rightSymbols[0]))
             }
         }
         return result
