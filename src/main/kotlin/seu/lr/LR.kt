@@ -84,10 +84,9 @@ class LR(rules: List<Production>, start: Symbol) {
     }
 
     /**
-     * Get First(β a) in A -> α·B β, a.
+     * Cache of function first.
      *
      * @param next β, following symbol.
-     * @param nextNext a, terminal symbol.
      * @return First(β a), a list of Symbol.
      */
     private fun firstInit(next: Symbol): List<Symbol> {
@@ -123,10 +122,11 @@ class LR(rules: List<Production>, start: Symbol) {
     }
 
     /**
-     * Recursive function.
+     * Recursive runnable class.
      *
+     * @param lr LR object to fill whose parsing table.
      * @param parent parent state.
-     * @param symbol edge from parent state to the next state
+     * @param symbol edge from parent state to the next state.
      */
     class Fill(private val lr: LR, private val parent: State, private val symbol: Symbol) : Runnable {
         override fun run() {

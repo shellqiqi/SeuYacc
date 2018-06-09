@@ -1,10 +1,11 @@
 package seu.lr
 
 /**
- * In a production A -> B1 B2 ... Bn
+ * In a production A -> B1 B2 ... Bn, with its action.
  *
  * @param leftSymbol A
  * @param rightSymbols Bs
+ * @param action action
  */
 class Production(val leftSymbol: Symbol, val rightSymbols: ArrayList<Symbol>, val action: String?) {
 

@@ -10,9 +10,10 @@ class ParsingTable {
 
     /**
      * Entry of parsing table. It stores an action and its target.
-     * Actions can be shift-in, reduce and accept. Targets can be a state, a production or nothing like null.
+     * Actions can be shift-in, reduce, goto and accept. Targets can be a state, a production or nothing like null.
      * Shift-in and move to state.
      * Reduce according to the production.
+     * Goto another state.
      * Accept with no target.
      *
      * @param label action should be taken
