@@ -18,7 +18,7 @@ class ParsingTableTest {
         @JvmStatic
         fun constructor() {
             val yaccFile1 = YaccFile("resource/example.y")
-            val lr = LR(yaccFile1.rules.keys.toList(), yaccFile1.start)
+            val lr = LR(yaccFile1.rules.toList(), yaccFile1.start)
             val item1 = Item(lr.productions[5], 0, Symbol.END)
             val item2 = Item(lr.productions[4], 1, Symbol.END)
             state1 = lr.closure(arrayListOf(item1))

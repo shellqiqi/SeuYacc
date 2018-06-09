@@ -15,7 +15,7 @@ class CodeFileTest {
         @JvmStatic
         fun beforeClass() {
             val yaccFile = YaccFile("resource/example.y")
-            val lr = LR(yaccFile.rules.keys.toList(), yaccFile.start)
+            val lr = LR(yaccFile.rules.toList(), yaccFile.start)
             codeFile = CodeFile(yaccFile, lr)
         }
     }

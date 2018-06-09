@@ -32,7 +32,7 @@ class LR(rules: List<Production>, start: Symbol) {
      * @param start start symbol.
      */
     private fun toAugment(start: Symbol) {
-        startProduction = Production(Symbol.START, arrayListOf(start))
+        startProduction = Production(Symbol.START, arrayListOf(start), null)
         productions.add(startProduction)
     }
 

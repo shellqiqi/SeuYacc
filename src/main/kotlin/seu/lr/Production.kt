@@ -6,7 +6,7 @@ package seu.lr
  * @param leftSymbol A
  * @param rightSymbols Bs
  */
-class Production(val leftSymbol: Symbol, val rightSymbols: ArrayList<Symbol>) {
+class Production(val leftSymbol: Symbol, val rightSymbols: ArrayList<Symbol>, val action: String?) {
 
     override fun toString(): String {
         return "$leftSymbol -> $rightSymbols".replace("[", "")

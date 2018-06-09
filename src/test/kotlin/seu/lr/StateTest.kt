@@ -15,8 +15,8 @@ class StateTest {
         fun constructor() {
             val yaccFile1 = YaccFile("resource/example.y")
             val yaccFile2 = YaccFile("resource/example2.y")
-            lr1 = LR(yaccFile1.rules.keys.toList(), yaccFile1.start)
-            lr2 = LR(yaccFile2.rules.keys.toList(), yaccFile2.start)
+            lr1 = LR(yaccFile1.rules.toList(), yaccFile1.start)
+            lr2 = LR(yaccFile2.rules.toList(), yaccFile2.start)
         }
     }
 
@@ -24,7 +24,7 @@ class StateTest {
     fun equalsTest() {
         val items1 = ArrayList<Item>()
         val items2 = ArrayList<Item>()
-        val pro = Production(Symbol.END, ArrayList())
+        val pro = Production(Symbol.END, ArrayList(), null)
         items1.add(Item(pro, 0, Symbol.END))
         items2.add(Item(pro, 0, Symbol.END))
         val o1 = State(items1)
