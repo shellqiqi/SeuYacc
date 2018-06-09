@@ -37,4 +37,10 @@ class CodeFileTest {
     fun productionsTest() {
         print(codeFile.productions())
     }
+
+    @Test
+    @Ignore
+    fun actionsTest() {
+        print(codeFile.actions())
+    }
 }

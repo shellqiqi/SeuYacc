@@ -69,6 +69,24 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
         return builder.toString()
     }
 
+    fun actions(): String {
+        val builder = StringBuilder()
+        for (i in lr.productions.indices) {
+            builder.append("""
+                void r$i() {
+                    ${lr.productions[i].action ?: ""}
+                }
+            """.trimIndent()).append('\n')
+        }
+        builder.append("vector<void(*)()> actions { ")
+        for (i in lr.productions.indices) {
+            builder.append("r$i,")
+        }
+        builder.deleteCharAt(builder.lastIndex)
+        builder.append(" };")
+        return builder.toString()
+    }
+
     fun parsingTable(): String {
         val builder = StringBuilder()
         builder.append("const unordered_map<int, unordered_map<>>")
