@@ -97,7 +97,13 @@ class LR(rules: List<Production>, start: Symbol) {
         val symbolStack = Stack<Symbol>()
         symbolStack.addAll(startState.getNext())
 
-        while (symbolStack.isNotEmpty()) fillParsingTable(startState, symbolStack.pop())
+        val threads = ArrayList<Thread>()
+        while (symbolStack.isNotEmpty()) {
+            val thread = Thread(Fill(this, startState, symbolStack.pop()))
+            threads.add(thread)
+            thread.start()
+        }
+        for (t in threads) t.join()
     }
 
     /**
@@ -125,5 +131,37 @@ class LR(rules: List<Production>, start: Symbol) {
         }
 
         while (symbolStack.isNotEmpty()) fillParsingTable(newState, symbolStack.pop())
+    }
+
+    class Fill(private val lr: LR, private val parent: State, private val symbol: Symbol) : Runnable {
+        override fun run() {
+            val newState = lr.closure(parent.shiftIn(symbol))
+            val symbolStack = Stack<Symbol>()
+
+            synchronized(lr.parsingTable, {
+                if (!lr.parsingTable.hasState(newState)) {
+                    lr.parsingTable.initState(newState)
+                    symbolStack.addAll(newState.getNext())
+                }
+                lr.parsingTable[parent, symbol] = ParsingTable.Entry(ParsingTable.Entry.SHIFT, newState)
+
+                newState.getReducible().forEach { item ->
+                    lr.parsingTable[newState, item.forward] =
+                            ParsingTable.Entry(
+                                    if (item.production.leftSymbol == Symbol.START)
+                                        ParsingTable.Entry.ACCEPT
+                                    else
+                                        ParsingTable.Entry.REDUCE, item.production)
+                }
+            })
+
+            val threads = ArrayList<Thread>()
+            while (symbolStack.isNotEmpty()) {
+                val thread = Thread(Fill(lr, newState, symbolStack.pop()))
+                threads.add(thread)
+                thread.start()
+            }
+            for (t in threads) t.join()
+        }
     }
 }
