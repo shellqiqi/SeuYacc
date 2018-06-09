@@ -128,27 +128,6 @@ class LR(rules: List<Production>, start: Symbol) {
      * @param parent parent state.
      * @param symbol edge from parent state to the next state
      */
-    private fun fillParsingTable(parent: State, symbol: Symbol) {
-        val newState = closure(parent.shiftIn(symbol))
-        val symbolStack = Stack<Symbol>()
-        if (!parsingTable.hasState(newState)) {
-            parsingTable.initState(newState)
-            symbolStack.addAll(newState.getNext())
-        }
-        parsingTable[parent, symbol] = ParsingTable.Entry(ParsingTable.Entry.SHIFT, newState)
-
-        newState.getReducible().forEach { item ->
-            parsingTable[newState, item.forward] =
-                    ParsingTable.Entry(
-                            if (item.production.leftSymbol == Symbol.START)
-                                ParsingTable.Entry.ACCEPT
-                            else
-                                ParsingTable.Entry.REDUCE, item.production)
-        }
-
-        while (symbolStack.isNotEmpty()) fillParsingTable(newState, symbolStack.pop())
-    }
-
     class Fill(private val lr: LR, private val parent: State, private val symbol: Symbol) : Runnable {
         override fun run() {
             val newState = lr.closure(parent.shiftIn(symbol))
@@ -159,7 +138,9 @@ class LR(rules: List<Production>, start: Symbol) {
                     lr.parsingTable.initState(newState)
                     symbolStack.addAll(newState.getNext())
                 }
-                lr.parsingTable[parent, symbol] = ParsingTable.Entry(ParsingTable.Entry.SHIFT, newState)
+                lr.parsingTable[parent, symbol] = ParsingTable.Entry(
+                        if (symbol.isTerminal()) ParsingTable.Entry.SHIFT
+                        else ParsingTable.Entry.GOTO, newState)
 
                 newState.getReducible().forEach { item ->
                     lr.parsingTable[newState, item.forward] =

@@ -23,24 +23,7 @@ class ParsingTable {
             const val SHIFT = 0
             const val REDUCE = 1
             const val ACCEPT = 2
-        }
-
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as Entry
-
-            if (label != other.label) return false
-            if (target != other.target) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = label
-            result = 31 * result + (target?.hashCode() ?: 0)
-            return result
+            const val GOTO = 3
         }
     }
 
@@ -96,6 +79,7 @@ class ParsingTable {
                     Entry.REDUCE -> "reduce"
                     Entry.ACCEPT -> "accept"
                     Entry.SHIFT -> "shift-in"
+                    Entry.GOTO -> "goto"
                     else -> throw Exception("Unknown label in ParsingTable.Entry")
                 }} ┆ ${entry.target}")
             }
