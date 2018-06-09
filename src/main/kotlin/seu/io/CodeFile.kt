@@ -10,7 +10,17 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
     private lateinit var writer: BufferedWriter
 
     private val indexedState = HashMap<State, Int>()
-    private val indexedProduction = HashMap<Production, Int>()
+    private val indexedProduction = lr.productions
+    private val indexedNonTerminalSymbol = HashMap<Symbol, Int>()
+
+    init {
+        var count = 0
+        for (state in lr.parsingTable.table.keys)
+            indexedState[state] = count++
+        count = 0
+        for (symbol in lr.productions.map { p -> p.leftSymbol }.toHashSet())
+            indexedNonTerminalSymbol[symbol] = count++
+    }
 
     fun writeFile(filePath: String) {
         writer = BufferedWriter(FileWriter(filePath))
