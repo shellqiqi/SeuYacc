@@ -43,4 +43,16 @@ class CodeFileTest {
     fun actionsTest() {
         print(codeFile.actions())
     }
+
+    @Test
+    @Ignore
+    fun parsingTableTest() {
+        print(codeFile.parsingTable())
+    }
+
+    @Test
+    @Ignore
+    fun gotoTableTest() {
+        print(codeFile.gotoTable())
+    }
 }

@@ -38,7 +38,11 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
     }
 
     fun generate(): String {
-        return include() + '\n'
+        return include() + '\n' +
+                productions() + '\n' +
+                actions() + '\n' +
+                parsingTable() + '\n' +
+                gotoTable() + '\n'
     }
 
     fun include(): String {
@@ -46,6 +50,8 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
             #include <iostream>
             #include <unordered_map>
             #include <string>
+            #include <vector>
+            #define $$ -1
             using namespace std;
         """.trimIndent()
     }
@@ -58,8 +64,8 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
                 int rl;
                 Production(int l, int rl) : l(l), rl(rl) {}
             };
-        """.trimIndent())
-        builder.append("\nvector<Production> productions {")
+        """.trimIndent()).append('\n')
+        builder.append("vector<Production> productions {")
         for (production in lr.productions) {
             builder.append("\n\t")
             builder.append("{${indexedNonTerminalSymbol[production.leftSymbol]}, ${production.rightSymbols.size}},")
@@ -88,8 +94,55 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
     }
 
     fun parsingTable(): String {
+        val builder = StringBuilder("""
+            class Entry {
+            public:
+                int lable;
+                int target;
+                Entry(int lable, int target) : lable(lable), target(target) {}
+            };
+        """.trimIndent()).append('\n')
+        builder.append("unordered_map<int, unordered_map<int, Entry>> parsingTable = {")
+        for ((state, index) in indexedState) {
+            builder.append("\n\t")
+            builder.append("{ $index, { ")
+            val row = lr.parsingTable.table[state] ?: HashMap()
+            for ((symbol, entry) in row) {
+                if (symbol.isNonTerminal()) continue
+                builder.append("{ ${symbol.name}, Entry(${entry.label}, ${when (entry.target) {
+                    is State -> indexedState[entry.target]
+                    is Production -> lr.productions.indexOf(entry.target)
+                    null -> -1
+                    else -> throw Exception("Never reached")
+                }}) },")
+            }
+            builder.deleteCharAt(builder.lastIndex)
+            builder.append(" } },")
+        }
+        builder.deleteCharAt(builder.lastIndex)
+        builder.append("};")
+        return builder.toString()
+    }
+
+    fun gotoTable(): String {
         val builder = StringBuilder()
-        builder.append("const unordered_map<int, unordered_map<>>")
-        return ""
+        builder.append("unordered_map<int, unordered_map<int, int>> gotoTable = {")
+        for ((state, index) in indexedState) {
+            builder.append("\n\t")
+            builder.append("{ $index, { ")
+            val row = lr.parsingTable.table[state] ?: HashMap()
+            for ((symbol, entry) in row) {
+                if (symbol.isTerminal()) continue
+                builder.append("{ ${indexedNonTerminalSymbol[symbol]}, ${when (entry.target) {
+                    is State -> indexedState[entry.target]
+                    else -> throw Exception("Never reached")
+                }} },")
+            }
+            builder.deleteCharAt(builder.lastIndex)
+            builder.append(" } },")
+        }
+        builder.deleteCharAt(builder.lastIndex)
+        builder.append("};")
+        return builder.toString()
     }
 }

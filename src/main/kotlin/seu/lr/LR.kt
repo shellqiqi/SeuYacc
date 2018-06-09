@@ -144,11 +144,10 @@ class LR(rules: List<Production>, start: Symbol) {
 
                 newState.getReducible().forEach { item ->
                     lr.parsingTable[newState, item.forward] =
-                            ParsingTable.Entry(
-                                    if (item.production.leftSymbol == Symbol.START)
-                                        ParsingTable.Entry.ACCEPT
-                                    else
-                                        ParsingTable.Entry.REDUCE, item.production)
+                            if (item.production.leftSymbol == Symbol.START)
+                                ParsingTable.Entry(ParsingTable.Entry.ACCEPT, null)
+                            else
+                                ParsingTable.Entry(ParsingTable.Entry.REDUCE, item.production)
                 }
             })
 
