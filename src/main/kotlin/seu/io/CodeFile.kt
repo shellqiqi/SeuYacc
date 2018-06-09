@@ -10,7 +10,6 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
     private lateinit var writer: BufferedWriter
 
     private val indexedState = HashMap<State, Int>()
-    private val indexedProduction = lr.productions
     private val indexedNonTerminalSymbol = HashMap<Symbol, Int>()
 
     init {
@@ -49,6 +48,25 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
             #include <string>
             using namespace std;
         """.trimIndent()
+    }
+
+    fun productions(): String {
+        val builder = StringBuilder("""
+            class Production {
+            public:
+                int l;
+                int rl;
+                Production(int l, int rl) : l(l), rl(rl) {}
+            };
+        """.trimIndent())
+        builder.append("\nvector<Production> productions {")
+        for (production in lr.productions) {
+            builder.append("\n\t")
+            builder.append("{${indexedNonTerminalSymbol[production.leftSymbol]}, ${production.rightSymbols.size}},")
+        }
+        builder.deleteCharAt(builder.lastIndex)
+        builder.append("\n};")
+        return builder.toString()
     }
 
     fun parsingTable(): String {

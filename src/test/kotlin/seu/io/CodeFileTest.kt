@@ -31,4 +31,10 @@ class CodeFileTest {
     fun includeTest() {
         print(codeFile.include())
     }
+
+    @Test
+    @Ignore
+    fun productionsTest() {
+        print(codeFile.productions())
+    }
 }
