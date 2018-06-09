@@ -2,6 +2,9 @@ package seu.lr
 
 /**
  * Item of an State
+ * For example,
+ * S -> .CC , $
+ * C -> c|d , c|d
  *
  * @param production a production like S -> CC, further information can be found in class Production
  * @param position the position of dot, from 0 to size of production's rightSymbols

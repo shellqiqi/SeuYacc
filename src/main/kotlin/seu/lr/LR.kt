@@ -84,10 +84,14 @@ class LR(rules: List<Production>, start: Symbol) {
     }
 
     /**
-     * Get First(β a) in A -> α·B β, a.
+     * Calculate first of non-terminal symbols that the input symbol might meet during deduction
+     * For example,
+     * given Symbol S and productions
+     * S -> CC | d
+     * C -> c
+     * we get a set {c,d}
      *
-     * @param next β, following symbol.
-     * @param nextNext a, terminal symbol.
+     * @param next , input symbol.
      * @return First(β a), a list of Symbol.
      */
     private fun firstInit(next: Symbol): List<Symbol> {
@@ -123,8 +127,9 @@ class LR(rules: List<Production>, start: Symbol) {
     }
 
     /**
-     * Recursive function.
+     * Recursive function and multi-thread
      *
+     * @param lr a lr(1) grammar analyzing table
      * @param parent parent state.
      * @param symbol edge from parent state to the next state
      */
