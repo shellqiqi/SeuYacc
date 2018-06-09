@@ -20,9 +20,9 @@ class LRTest {
             val yaccFile2 = YaccFile("resource/example2.y")
             val yaccFile3 = YaccFile("resource/example3.y")
 
-            lr1 = LR(yaccFile1.rules.keys.toList(), yaccFile1.start)
-            lr2 = LR(yaccFile2.rules.keys.toList(), yaccFile2.start)
-            lr3 = LR(yaccFile3.rules.keys.toList(), yaccFile3.start)
+            lr1 = LR(yaccFile1.rules.toList(), yaccFile1.start)
+            lr2 = LR(yaccFile2.rules.toList(), yaccFile2.start)
+            lr3 = LR(yaccFile3.rules.toList(), yaccFile3.start)
 
         }
     }
@@ -67,7 +67,7 @@ class LRTest {
     @Ignore
     fun testLr4() {
         val yaccFile4 = YaccFile("resource/example4.y")
-        val lr4 = LR(yaccFile4.rules.keys.toList(), yaccFile4.start)
+        val lr4 = LR(yaccFile4.rules.toList(), yaccFile4.start)
         println(lr4.parsingTable.table.size)
     }
 }

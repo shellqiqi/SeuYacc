@@ -22,7 +22,7 @@ class YaccFile(filePath: String) {
     /* The start symbol defined by %start */
     lateinit var start: Symbol
     /* Rules defined between %% */
-    var rules = HashMap<Production, String?>()
+    var rules = HashSet<Production>()
     /* Segment after the last %% */
     var userSeg = StringBuffer()
 
@@ -121,8 +121,8 @@ class YaccFile(filePath: String) {
                                         else
                                             Symbol.NON_TERMINAL, s))
                             }
-                    val pro = Production(Symbol(Symbol.NON_TERMINAL, left), symbols)
-                    rules[pro] = action
+                    val pro = Production(Symbol(Symbol.NON_TERMINAL, left), symbols, action)
+                    rules.add(pro)
                 }
             }
         }
