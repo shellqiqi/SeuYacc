@@ -1,6 +1,7 @@
 package seu.lr
 
 import java.util.*
+import kotlin.collections.LinkedHashSet
 
 /**
  * Construct LR and its parsing table by given rules.
@@ -43,11 +44,11 @@ class LR(rules: List<Production>, start: Symbol) {
      * @return a State with items contain itemList and its closure
      */
     fun closure(itemList: List<Item>): State {
-        val items = ArrayList(itemList)
+        val items = LinkedHashSet(itemList)
         var index = 0
         while (true) {
             if (items.size <= index) break
-            val item = items[index++]
+            val item = items.elementAt(index++)
             val next = item.next ?: continue
             if (next.isTerminal()) continue
             for (production in productions) {
@@ -59,7 +60,7 @@ class LR(rules: List<Production>, start: Symbol) {
                     }
             }
         }
-        return State(items)
+        return State(items.toList())
     }
 
     /**
@@ -75,7 +76,7 @@ class LR(rules: List<Production>, start: Symbol) {
         if (symbol.isTerminal()) result.add(symbol)
         else {
             productions.forEach { production ->
-                if (production.leftSymbol == next)
+                if (production.leftSymbol == symbol)
                     result.addAll(first(null, production.rightSymbols[0]))
             }
         }
