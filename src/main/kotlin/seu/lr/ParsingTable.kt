@@ -48,14 +48,23 @@ class ParsingTable {
      * @throws Exception missing state in parsing table.
      */
     operator fun set(state: State, symbol: Symbol, value: Entry) {
+        val warning = { message: String -> println("\u001b[33m$message\u001b[0m") }
         if (table[state] == null) throw Exception("Parsing table error - Missing state.")
-        if (table[state]?.containsKey(symbol) == true) throw Exception("""
-            |Parsing table error - Find conflict
-            |$state
-            |$symbol
-            |${value.label} | ${value.target}
-            |${table[state]?.get(symbol)?.label} | ${table[state]?.get(symbol)?.target}
-        """.trimMargin()) // TODO: resolve conflict
+        if (table[state]?.containsKey(symbol) == true) {
+            if (value.label == Entry.SHIFT && table[state]?.get(symbol)?.label == Entry.REDUCE) {
+                warning("Find shift-in and reject reduce")
+                return
+            } else if (value.label == Entry.REDUCE && table[state]?.get(symbol)?.label == Entry.SHIFT) {
+                warning("Find reduce but covered with shift-in")
+                table[state]?.set(symbol, value)
+            } else throw Exception("""
+                |Parsing table error - Find conflict
+                |$state
+                |$symbol
+                |${value.label} | ${value.target}
+                |${table[state]?.get(symbol)?.label} | ${table[state]?.get(symbol)?.target}
+            """.trimMargin())
+        }
         table[state]?.set(symbol, value)
     }
 
