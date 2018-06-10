@@ -155,26 +155,36 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
                 stack<int> stack;
                 stack.push(${indexedState[lr.startState]});
                 while (true) {
-                    int s = stack.top();
-                    Entry e = parsingTable.at(s).at(a);
-                    if (e.label == 0) {
-                        stack.push(e.target);
-                        a = yylex();
-                    }
-                    else if (e.label == 1) {
-                        for (size_t i = 0; i < productions.at(e.target).rl; i++)
-                        {
-                            stack.pop();
+                    try
+                    {
+                        int s = stack.top();
+                        Entry e = parsingTable.at(s).at(a);
+                        if (e.label == 0) {
+                            stack.push(e.target);
+                            a = yylex();
                         }
-                        int t = stack.top();
-                        stack.push(gotoTable.at(t).at(a));
-                        actions.at(e.target)();
+                        else if (e.label == 1) {
+                            for (size_t i = 0; i < productions.at(e.target).rl; i++)
+                            {
+                                stack.pop();
+                            }
+                            int t = stack.top();
+                            stack.push(gotoTable.at(t).at(productions.at(e.target).l));
+                            actions.at(e.target)();
+                        }
+                        else if (e.label == 2) {
+                            break;
+                        }
                     }
-                    else if (e.label == 2) {
-                        break;
-                    }
-                    else {
+                    catch (const std::out_of_range& oor)
+                    {
                         yyerror();
+                        return;
+                    }
+                    catch (const std::exception&)
+                    {
+                        cerr << "fatal error" << endl;
+                        return;
                     }
                 }
             }
