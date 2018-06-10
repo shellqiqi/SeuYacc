@@ -6,7 +6,7 @@ import seu.lr.LR
 
 fun main(args: Array<String>) {
     if (args.size != 2) {
-        println("Please input a file.")
+        println("Need two arguments - InputFile OutputFile")
         return
     }
     val yaccFile = YaccFile(args[0])
