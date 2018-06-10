@@ -17,6 +17,8 @@ class LR(rules: List<Production>, start: Symbol) {
     val parsingTable = ParsingTable()
     /* The start production */
     lateinit var startProduction: Production
+    /* The start state */
+    lateinit var startState: State
 
     private val firstOfNonTerminal = HashMap<Symbol, List<Symbol>>()
 
@@ -92,7 +94,7 @@ class LR(rules: List<Production>, start: Symbol) {
      * we get a set {c,d}
      *
      * @param next , input symbol.
-     * @return First(β a), a list of Symbol.
+     * @return a list of Symbol.
      */
     private fun firstInit(next: Symbol): List<Symbol> {
         val result: HashSet<Symbol> = HashSet()
@@ -111,7 +113,7 @@ class LR(rules: List<Production>, start: Symbol) {
      * Generate a complete parsing table.
      */
     private fun fillParsingTable() {
-        val startState = closure(arrayListOf(Item(startProduction, 0, Symbol.END)))
+        startState = closure(arrayListOf(Item(startProduction, 0, Symbol.END)))
         parsingTable.initState(startState)
 
         val symbolStack = Stack<Symbol>()
@@ -127,11 +129,11 @@ class LR(rules: List<Production>, start: Symbol) {
     }
 
     /**
-     * Recursive function and multi-thread
+     * Recursive runnable class.
      *
-     * @param lr a lr(1) grammar analyzing table
+     * @param lr LR object to fill whose parsing table.
      * @param parent parent state.
-     * @param symbol edge from parent state to the next state
+     * @param symbol edge from parent state to the next state.
      */
     class Fill(private val lr: LR, private val parent: State, private val symbol: Symbol) : Runnable {
         override fun run() {
