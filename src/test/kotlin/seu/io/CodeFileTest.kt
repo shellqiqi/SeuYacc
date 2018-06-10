@@ -55,4 +55,10 @@ class CodeFileTest {
     fun gotoTableTest() {
         print(codeFile.gotoTable())
     }
+
+    @Test
+    @Ignore
+    fun parseTest() {
+        print(codeFile.parse())
+    }
 }

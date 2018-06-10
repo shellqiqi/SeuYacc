@@ -42,7 +42,8 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
                 productions() + '\n' +
                 actions() + '\n' +
                 parsingTable() + '\n' +
-                gotoTable() + '\n'
+                gotoTable() + '\n' +
+                parse() + '\n'
     }
 
     fun include(): String {
@@ -51,6 +52,7 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
             #include <unordered_map>
             #include <string>
             #include <vector>
+            #include <stack>
             #define $$ -1
             using namespace std;
         """.trimIndent()
@@ -97,9 +99,9 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
         val builder = StringBuilder("""
             class Entry {
             public:
-                int lable;
+                int label;
                 int target;
-                Entry(int lable, int target) : lable(lable), target(target) {}
+                Entry(int label, int target) : label(label), target(target) {}
             };
         """.trimIndent()).append('\n')
         builder.append("unordered_map<int, unordered_map<int, Entry>> parsingTable = {")
@@ -144,5 +146,38 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
         builder.deleteCharAt(builder.lastIndex)
         builder.append("};")
         return builder.toString()
+    }
+
+    fun parse(): String {
+        return """
+            void yyparse() {
+                int a = yylex();
+                stack<int> stack;
+                stack.push(${indexedState[lr.startState]});
+                while (true) {
+                    int s = stack.top();
+                    Entry e = parsingTable.at(s).at(a);
+                    if (e.label == 0) {
+                        stack.push(e.target);
+                        a = yylex();
+                    }
+                    else if (e.label == 1) {
+                        for (size_t i = 0; i < productions.at(e.target).rl; i++)
+                        {
+                            stack.pop();
+                        }
+                        int t = stack.top();
+                        stack.push(gotoTable.at(t).at(a));
+                        actions.at(e.target)();
+                    }
+                    else if (e.label == 2) {
+                        break;
+                    }
+                    else {
+                        yyerror();
+                    }
+                }
+            }
+        """.trimIndent()
     }
 }

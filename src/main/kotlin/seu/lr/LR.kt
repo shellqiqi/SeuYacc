@@ -17,6 +17,8 @@ class LR(rules: List<Production>, start: Symbol) {
     val parsingTable = ParsingTable()
     /* The start production */
     lateinit var startProduction: Production
+    /* The start state */
+    lateinit var startState: State
 
     private val firstOfNonTerminal = HashMap<Symbol, List<Symbol>>()
 
@@ -106,7 +108,7 @@ class LR(rules: List<Production>, start: Symbol) {
      * Generate a complete parsing table.
      */
     private fun fillParsingTable() {
-        val startState = closure(arrayListOf(Item(startProduction, 0, Symbol.END)))
+        startState = closure(arrayListOf(Item(startProduction, 0, Symbol.END)))
         parsingTable.initState(startState)
 
         val symbolStack = Stack<Symbol>()
