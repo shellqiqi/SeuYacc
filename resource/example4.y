@@ -1,8 +1,5 @@
 %{
 #include <stdio.h>
-
-extern char yytext[];
-extern int column;
 %}
 
 %token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF
@@ -423,9 +420,19 @@ function_definition
 
 %%
 
-char *s;
-void yyerror(s)
+void yyerror()
 {
 	fflush(stdout);
-	printf("\n%*s\n%*s\n", column, "^", column, s);
+	printf("error %d %s\n", column, yytext.c_str());
+}
+
+int main(int argc, char *argv[]) {
+	if (argc > 1)
+		fopen_s(&yyin, argv[1], "r");
+	if (NULL == yyin)
+	{
+		cerr << "Wrong path input.\n";
+		return -1;
+	}
+	yyparse();
 }

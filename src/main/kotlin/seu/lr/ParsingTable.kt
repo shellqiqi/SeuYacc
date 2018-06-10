@@ -49,6 +49,13 @@ class ParsingTable {
      */
     operator fun set(state: State, symbol: Symbol, value: Entry) {
         if (table[state] == null) throw Exception("Parsing table error - Missing state.")
+        if (table[state]?.containsKey(symbol) == true) throw Exception("""
+            |Parsing table error - Find conflict
+            |$state
+            |$symbol
+            |${value.label} | ${value.target}
+            |${table[state]?.get(symbol)?.label} | ${table[state]?.get(symbol)?.target}
+        """.trimMargin()) // TODO: resolve conflict
         table[state]?.set(symbol, value)
     }
 

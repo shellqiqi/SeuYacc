@@ -53,8 +53,14 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
             #include <string>
             #include <vector>
             #include <stack>
+            #include "yy.tab.h"
             #define $$ -1
             using namespace std;
+            extern FILE* yyin;
+            extern FILE* yyout;
+            extern string yytext;
+            extern int column;
+            void yyerror();
         """.trimIndent()
     }
 
@@ -150,8 +156,15 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
 
     fun parse(): String {
         return """
+            int yylex_() {
+                int t = 0;
+                do {
+                    t = yylex();
+                } while (t == 0);
+                return t;
+            }
             void yyparse() {
-                int a = yylex();
+                int a = yylex_();
                 stack<int> stack;
                 stack.push(${indexedState[lr.startState]});
                 while (true) {
@@ -161,7 +174,7 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
                         Entry e = parsingTable.at(s).at(a);
                         if (e.label == 0) {
                             stack.push(e.target);
-                            a = yylex();
+                            a = yylex_();
                         }
                         else if (e.label == 1) {
                             for (size_t i = 0; i < productions.at(e.target).rl; i++)
