@@ -144,18 +144,19 @@ class LR(rules: List<Production>, start: Symbol) {
                 if (!lr.parsingTable.hasState(newState)) {
                     lr.parsingTable.initState(newState)
                     symbolStack.addAll(newState.getNext())
+
+                    newState.getReducible().forEach { item ->
+                        lr.parsingTable[newState, item.forward] =
+                                if (item.production.leftSymbol == Symbol.START)
+                                    ParsingTable.Entry(ParsingTable.Entry.ACCEPT, null)
+                                else
+                                    ParsingTable.Entry(ParsingTable.Entry.REDUCE, item.production)
+                    }
                 }
+
                 lr.parsingTable[parent, symbol] = ParsingTable.Entry(
                         if (symbol.isTerminal()) ParsingTable.Entry.SHIFT
                         else ParsingTable.Entry.GOTO, newState)
-
-                newState.getReducible().forEach { item ->
-                    lr.parsingTable[newState, item.forward] =
-                            if (item.production.leftSymbol == Symbol.START)
-                                ParsingTable.Entry(ParsingTable.Entry.ACCEPT, null)
-                            else
-                                ParsingTable.Entry(ParsingTable.Entry.REDUCE, item.production)
-                }
             })
 
             val threads = ArrayList<Thread>()
