@@ -2,7 +2,6 @@ package seu.io
 
 import org.junit.Test
 
-import org.junit.Assert.*
 import org.junit.BeforeClass
 import org.junit.Ignore
 import seu.lr.LR
@@ -29,7 +28,7 @@ class CodeFileTest {
     @Test
     @Ignore
     fun includeTest() {
-        print(codeFile.include())
+        print(codeFile.head())
     }
 
     @Test

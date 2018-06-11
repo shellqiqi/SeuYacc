@@ -12,7 +12,7 @@ class Production(val leftSymbol: Symbol, val rightSymbols: ArrayList<Symbol>, va
     override fun toString(): String {
         return "$leftSymbol -> $rightSymbols".replace("[", "")
                 .replace("]", "")
-                .replace(",", "")
+                .replace(",", "") + " $action"
     }
 
     override fun equals(other: Any?): Boolean {

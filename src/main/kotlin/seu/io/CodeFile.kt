@@ -38,7 +38,8 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
     }
 
     fun generate(): String {
-        return include() + '\n' +
+        return head() + '\n' +
+                token() + '\n' +
                 productions() + '\n' +
                 actions() + '\n' +
                 parsingTable() + '\n' +
@@ -46,7 +47,7 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
                 parse() + '\n'
     }
 
-    fun include(): String {
+    fun head(): String {
         return """
             #include <iostream>
             #include <unordered_map>
@@ -62,6 +63,20 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
             extern int column;
             void yyerror();
         """.trimIndent()
+    }
+
+    fun token(): String {
+        val builder = StringBuilder("""
+            class Token {
+            public:
+                string name;
+                unsigned char* value;
+                int length;
+                Token(){}
+            };
+            stack<Token> tokenStack;
+        """.trimIndent())
+        return builder.toString()
     }
 
     fun productions(): String {
@@ -86,9 +101,18 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
     fun actions(): String {
         val builder = StringBuilder()
         for (i in lr.productions.indices) {
-            builder.append("""
-                void r$i() {
-                    ${lr.productions[i].action ?: ""}
+            builder.append("void r$i() {")
+            lr.productions[i].rightSymbols.forEachIndexed { index, _ ->
+                builder.append("\n\t").append("""
+                        Token t${lr.productions[i].rightSymbols.size - index} = tokenStack.top(); tokenStack.pop();
+                    """.trimIndent())
+            }
+            builder.append("\n").append("""
+                    Token newToken;
+                    ${(lr.productions[i].action ?: "")
+                    .replace("$$", "newToken")
+                    .replace("$", "t")}
+                    tokenStack.push(newToken);
                 }
             """.trimIndent()).append('\n')
         }
@@ -175,6 +199,7 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
                         if (e.label == 0) {
                             stack.push(e.target);
                             a = yylex_();
+                            tokenStack.push(Token());
                         }
                         else if (e.label == 1) {
                             for (size_t i = 0; i < productions.at(e.target).rl; i++)
