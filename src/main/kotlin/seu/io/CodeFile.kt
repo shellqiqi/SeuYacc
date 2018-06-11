@@ -135,12 +135,14 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
         for (i in lr.productions.indices) {
             builder.append("""
                 void r$i() {
-                    SyntaxTree * temp = new SyntaxTree();
+                    SyntaxTree *temp = new SyntaxTree();
+                    Node *pNode = new Node("${lr.productions[i].leftSymbol}", "${lr.productions[i].rightSymbols}", temp);
+                    temp->parent = pNode;
                     for (int i = 0; i < ${lr.productions[i].rightSymbols.size}; i++) {
                         temp->nodes.push_front(syntaxTree.nodes.back());
                         syntaxTree.nodes.pop_back();
                     }
-                    syntaxTree.nodes.push_back(Node("${lr.productions[i].leftSymbol}", "${lr.productions[i].rightSymbols}", temp));
+                    syntaxTree.nodes.push_back(*pNode);
                 }
             """.trimIndent()).append('\n')
         }
