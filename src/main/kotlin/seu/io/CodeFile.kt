@@ -39,7 +39,7 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
 
     fun generate(): String {
         return head() + '\n' +
-                token() + '\n' +
+                syntaxTree() + '\n' +
                 productions() + '\n' +
                 actions() + '\n' +
                 parsingTable() + '\n' +
@@ -52,6 +52,7 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
             #include <iostream>
             #include <unordered_map>
             #include <string>
+            #include <deque>
             #include <vector>
             #include <stack>
             #include "yy.tab.h"
@@ -65,18 +66,47 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
         """.trimIndent()
     }
 
-    fun token(): String {
-        val builder = StringBuilder("""
-            class Token {
+    fun syntaxTree(): String {
+        return """
+            class SyntaxTree;
+            class Node;
+
+            class Node {
             public:
+                string type;
                 string name;
-                unsigned char* value;
-                int length;
-                Token(){}
+                SyntaxTree * child;
+
+                Node(string type = "", string name = "", SyntaxTree * child = nullptr) :type(type), name(name), child(child) {}
+
+                bool hasChild() { return !(child == nullptr); }
+                string toString() { return string("(").append(type).append(",").append(name).append(")"); }
             };
-            stack<Token> tokenStack;
-        """.trimIndent())
-        return builder.toString()
+
+            class SyntaxTree {
+            public:
+                Node * parent;
+                deque<Node> nodes;
+
+                SyntaxTree(Node * parent = nullptr) : parent(parent) {}
+
+                bool hasParent() { return !(parent == nullptr); }
+                void output() { output(this, 0); }
+            private:
+                void mcout(int x, string s) {
+                    for (size_t i = 0; i < x; i++)
+                        cout << "| ";
+                    cout << s << endl;
+                }
+                void output(SyntaxTree* syntaxTree, int deep) {
+                    for (size_t i = 0; i < syntaxTree->nodes.size(); i++) {
+                        mcout(deep, syntaxTree->nodes.at(i).toString());
+                        if (syntaxTree->nodes.at(i).hasChild())
+                            output(syntaxTree->nodes.at(i).child, deep + 1);
+                    }
+                }
+            };
+        """.trimIndent()
     }
 
     fun productions(): String {
@@ -99,20 +129,18 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
     }
 
     fun actions(): String {
-        val builder = StringBuilder()
+        val builder = StringBuilder("""
+            SyntaxTree syntaxTree;
+        """.trimIndent()).append('\n')
         for (i in lr.productions.indices) {
-            builder.append("void r$i() {")
-            lr.productions[i].rightSymbols.forEachIndexed { index, _ ->
-                builder.append("\n\t").append("""
-                        Token t${lr.productions[i].rightSymbols.size - index} = tokenStack.top(); tokenStack.pop();
-                    """.trimIndent())
-            }
-            builder.append("\n").append("""
-                    Token newToken;
-                    ${(lr.productions[i].action ?: "")
-                    .replace("$$", "newToken")
-                    .replace("$", "t")}
-                    tokenStack.push(newToken);
+            builder.append("""
+                void r$i() {
+                    SyntaxTree * temp = new SyntaxTree();
+                    for (int i = 0; i < ${lr.productions[i].rightSymbols.size}; i++) {
+                        temp->nodes.push_front(syntaxTree.nodes.back());
+                        syntaxTree.nodes.pop_back();
+                    }
+                    syntaxTree.nodes.push_back(Node("${lr.productions[i].leftSymbol}", "${lr.productions[i].rightSymbols}", temp));
                 }
             """.trimIndent()).append('\n')
         }
@@ -198,8 +226,8 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
                         Entry e = parsingTable.at(s).at(a);
                         if (e.label == 0) {
                             stack.push(e.target);
+                            syntaxTree.nodes.push_back(Node(to_string(a), yytext));
                             a = yylex_();
-                            tokenStack.push(Token());
                         }
                         else if (e.label == 1) {
                             for (size_t i = 0; i < productions.at(e.target).rl; i++)
