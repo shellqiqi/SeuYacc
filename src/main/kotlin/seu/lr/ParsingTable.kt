@@ -69,11 +69,10 @@ class ParsingTable {
         if (table[state] == null) throw Exception("Parsing table error - Missing state.")
         if (table[state]?.containsKey(symbol) == true) {
             if (value.label == Entry.SHIFT && table[state]?.get(symbol)?.label == Entry.REDUCE) {
+                println("Find reduce but covered with shift-in")
+            } else if (value.label == Entry.REDUCE && table[state]?.get(symbol)?.label == Entry.SHIFT) {
                 println("Find shift-in and reject reduce")
                 return
-            } else if (value.label == Entry.REDUCE && table[state]?.get(symbol)?.label == Entry.SHIFT) {
-                println("Find reduce but covered with shift-in")
-                table[state]?.set(symbol, value)
             } else throw Exception("""
                 |Parsing table error - Find conflict
                 |$state
