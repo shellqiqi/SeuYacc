@@ -40,6 +40,7 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
     fun generate(): String {
         return head() + '\n' +
                 token() + '\n' +
+                symbol() + '\n' +
                 productions() + '\n' +
                 actions() + '\n' +
                 parsingTable() + '\n' +
@@ -70,11 +71,30 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
             class Token {
             public:
                 string name;
-                unsigned char* value;
+                vector<string> values;
                 int length;
-                Token(){}
+                Token(string name = "", vector<string> values = vector<string>(), int length = 0)
+                    :name(name), values(values), length(length) {}
             };
             stack<Token> tokenStack;
+        """.trimIndent())
+        return builder.toString()
+    }
+
+    fun symbol(): String {
+        val builder = StringBuilder("""
+            class SymbolTable {
+            public:
+                    vector<string> type;
+                    vector<string> name;
+                    void add(string type, vector<string> ids) {
+                        for(int i = 0; i < ids.size(); i++) {
+                            this -> type.push_back(type);
+                            this -> name.push_back(ids[i]);
+                        }
+                    }
+            };
+            vector<SymbolTable> symbolTableStack;
         """.trimIndent())
         return builder.toString()
     }
@@ -184,10 +204,34 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
                 int t = 0;
                 do {
                     t = yylex();
+                    if (yytext == "\n") {
+                        for (int i = 0; i < 3; i++) {
+                            for (int j = 0; j < 100; j++)
+                                cout << " ";
+                            cout << endl;
+                        }
+                        cout << "现在的符号表：";
+                        for (int j = 0; j < 100; j++)
+                            cout << " ";
+                        cout << endl;
+                        for (int i = 0; i < symbolTableStack.size(); i++) {
+                            SymbolTable st = symbolTableStack[i];
+                            for (int j = 0; j < st.name.size(); j++) {
+                                cout << " name: " << st.name[j] + " type: " << st.type[j];
+                            }
+                            for (int j = 0; j < 100; j++)
+                                cout << " ";
+                            cout << endl;
+                        }
+                        coord.Y++;
+                        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+                    }
                 } while (t == 0);
                 return t;
             }
             void yyparse() {
+                coord.Y = 1;
+                symbolTableStack.push_back(SymbolTable());
                 int a = yylex_();
                 stack<int> stack;
                 stack.push(${indexedState[lr.startState]});
@@ -198,8 +242,8 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
                         Entry e = parsingTable.at(s).at(a);
                         if (e.label == 0) {
                             stack.push(e.target);
+                            tokenStack.push(Token(yytext));
                             a = yylex_();
-                            tokenStack.push(Token());
                         }
                         else if (e.label == 1) {
                             for (size_t i = 0; i < productions.at(e.target).rl; i++)

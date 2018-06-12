@@ -1,5 +1,7 @@
 %{
 #include <stdio.h>
+#include <Windows.h>
+COORD coord;
 %}
 
 %token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF
@@ -155,27 +157,27 @@ constant_expression
 	;
 
 declaration
-	: declaration_specifiers ';'
-	| declaration_specifiers init_declarator_list ';'
+	: declaration_specifiers ';' { if(!tokenStack.empty() && tokenStack.top().name == "{") symbolTableStack.push_back(SymbolTable());}
+	| declaration_specifiers init_declarator_list ';' { if(!tokenStack.empty() && tokenStack.top().name == "{") symbolTableStack.push_back(SymbolTable()); symbolTableStack.back().add($1.name, $2.values); }
 	;
 
 declaration_specifiers
 	: storage_class_specifier
 	| storage_class_specifier declaration_specifiers
-	| type_specifier
+	| type_specifier { $$.name = $1.name; }
 	| type_specifier declaration_specifiers
 	| type_qualifier
 	| type_qualifier declaration_specifiers
 	;
 
 init_declarator_list
-	: init_declarator
-	| init_declarator_list ',' init_declarator
+	: init_declarator { $$.values.push_back($1.name); }
+	| init_declarator_list ',' init_declarator { $1.values.push_back($3.name); $$.values = $1.values; }
 	;
 
 init_declarator
-	: declarator
-	| declarator '=' initializer
+	: declarator { $$.name = $1.name; }
+	| declarator '=' initializer { $$.name = $1.name; }
 	;
 
 storage_class_specifier
@@ -187,24 +189,24 @@ storage_class_specifier
 	;
 
 type_specifier
-	: VOID
-	| CHAR
-	| SHORT
-	| INT
-	| LONG
-	| FLOAT
-	| DOUBLE
-	| SIGNED
-	| UNSIGNED
-	| struct_or_union_specifier
-	| enum_specifier
-	| TYPE_NAME
+	: VOID { $$.name = "VOID"; }
+	| CHAR { $$.name = "CHAR"; }
+	| SHORT { $$.name = "SHORT"; }
+	| INT { $$.name = "INT"; }
+	| LONG { $$.name = "LONG"; }
+	| FLOAT { $$.name = "FLOAT"; }
+	| DOUBLE { $$.name = "DOUBLE"; }
+	| SIGNED { $$.name = "SIGNED"; }
+	| UNSIGNED { $$.name = "UNSIGNED"; }
+	| struct_or_union_specifier { $$.name = "struct_or_union_specifier"; }
+	| enum_specifier { $$.name = "enum_specifier"; }
+	| TYPE_NAME { $$.name = "TYPE_NAME"; }
 	;
 
 struct_or_union_specifier
-	: struct_or_union IDENTIFIER '{' struct_declaration_list '}'
+	: struct_or_union IDENTIFIER '{' struct_declaration_list '}' { $$.name = $2.name; }
 	| struct_or_union '{' struct_declaration_list '}'
-	| struct_or_union IDENTIFIER
+	| struct_or_union IDENTIFIER { $$.name = $2.name; }
 	;
 
 struct_or_union
@@ -262,17 +264,17 @@ type_qualifier
 
 declarator
 	: pointer direct_declarator
-	| direct_declarator
+	| direct_declarator { $$.name = $1.name; }
 	;
 
 direct_declarator
-	: IDENTIFIER
-	| '(' declarator ')'
-	| direct_declarator '[' constant_expression ']'
-	| direct_declarator '[' ']'
-	| direct_declarator '(' parameter_type_list ')'
-	| direct_declarator '(' identifier_list ')'
-	| direct_declarator '(' ')'
+	: IDENTIFIER { $$.name = $1.name; }
+	| '(' declarator ')' { $$.name = $2.name; }
+	| direct_declarator '[' constant_expression ']' { $$.name = $1.name + "[]"; }
+	| direct_declarator '[' ']' { $$.name = $1.name + "[]"; }
+	| direct_declarator '(' parameter_type_list ')' { $$.name = $1.name; }
+	| direct_declarator '(' identifier_list ')' { $$.name = $1.name; }
+	| direct_declarator '(' ')' { $$.name = $1.name; }
 	;
 
 pointer
@@ -361,8 +363,8 @@ labeled_statement
 compound_statement
 	: '{' '}'
 	| '{' statement_list '}'
-	| '{' declaration_list '}'
-	| '{' declaration_list statement_list '}'
+	| '{' declaration_list '}' { symbolTableStack.pop_back(); }
+	| '{' declaration_list statement_list '}'  { symbolTableStack.pop_back(); }
 	;
 
 declaration_list
