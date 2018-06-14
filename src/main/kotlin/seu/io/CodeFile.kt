@@ -91,19 +91,35 @@ class CodeFile(private val yaccFile: YaccFile, private val lr: LR) {
                 SyntaxTree(Node * parent = nullptr) : parent(parent) {}
 
                 bool hasParent() { return !(parent == nullptr); }
-                void output() { output(this, 0); }
+                void output() {
+                    deque<bool> d;
+                    output(this, d);
+                }
             private:
-                void mcout(int x, string s) {
-                    for (size_t i = 0; i < x; i++)
-                        cout << "| ";
+                void mcout(deque<bool> deep, string s) {
+                    for (size_t i = 0; i < deep.size() - 1; i++)
+                        if (deep.at(i))
+                            cout << "│ ";
+                        else
+                            cout << "  ";
+                    if (deep.back())
+                        cout << "├─";
+                    else
+                        cout << "└─";
                     cout << s << endl;
                 }
-                void output(SyntaxTree* syntaxTree, int deep) {
+                void output(SyntaxTree* syntaxTree, deque<bool> &deep) {
+                    deep.push_back(true);
                     for (size_t i = 0; i < syntaxTree->nodes.size(); i++) {
+                        if (i == syntaxTree->nodes.size() - 1) {
+                            deep.pop_back();
+                            deep.push_back(false);
+                        }
                         mcout(deep, syntaxTree->nodes.at(i).toString());
                         if (syntaxTree->nodes.at(i).hasChild())
-                            output(syntaxTree->nodes.at(i).child, deep + 1);
+                            output(syntaxTree->nodes.at(i).child, deep);
                     }
+                    deep.pop_back();
                 }
             };
         """.trimIndent()
