@@ -17,7 +17,7 @@ Here is an [example yacc file](resource/example4.y) of ANSI C.
 Running JAR need two arguments
 
 ```sh
-InputFile OutputFile
+path/to/intputFile path/to/outputFile
 ```
 
 The input file is your yacc file.
@@ -51,3 +51,94 @@ We prefer shift-in instead of reduce to solve IF-ELSE ambiguity.
 We did not consider priorities and integration.
 
 And a too big output C++ file.
+
+## Example
+
+This example need generated code from example of [SeuLex](https://github.com/shellqiqi/SeuLex) and the [example yacc file](resource/example4.y) of ANSI C. Check out if you have `lex.cpp` and `yy.tab.h` already. Run JAR built on brach syntax_tree(not the one in release) with `example4.y`.
+
+```sh
+$ java -jar SeuYacc-1.0.jar path/to/example4.y path/to/yacc.cpp
+```
+
+We will get `yacc.cpp`. Before compile `lex.cpp`, `yy.tab.h` and `yacc.cpp` together, remove function `main` in `lex.cpp`. Like the example in SeuLex, the executable file takes one argument which is the file you want to parse. Or no arguments, you can input your code in console directly.
+
+Input code segment
+
+```cpp
+int main() {
+    int a = 0;
+    return a;
+}
+```
+
+Output in console
+```
+└─(translation_unit,[external_declaration])
+  └─(external_declaration,[function_definition])
+    └─(function_definition,[declaration_specifiers, declarator, compound_statement])
+      ├─(declaration_specifiers,[type_specifier])
+      │ └─(type_specifier,[INT])
+      │   └─(142,int)
+      ├─(declarator,[direct_declarator])
+      │ └─(direct_declarator,[direct_declarator, '(', ')'])
+      │   ├─(direct_declarator,[IDENTIFIER])
+      │   │ └─(10000,main)
+      │   ├─(40,()
+      │   └─(41,))
+      └─(compound_statement,['{', declaration_list, statement_list, '}'])
+        ├─(123,{)
+        ├─(declaration_list,[declaration])
+        │ └─(declaration,[declaration_specifiers, init_declarator_list, ';'])
+        │   ├─(declaration_specifiers,[type_specifier])
+        │   │ └─(type_specifier,[INT])
+        │   │   └─(142,int)
+        │   ├─(init_declarator_list,[init_declarator])
+        │   │ └─(init_declarator,[declarator, '=', initializer])
+        │   │   ├─(declarator,[direct_declarator])
+        │   │   │ └─(direct_declarator,[IDENTIFIER])
+        │   │   │   └─(10000,a)
+        │   │   ├─(61,=)
+        │   │   └─(initializer,[assignment_expression])
+        │   │     └─(assignment_expression,[conditional_expression])
+        │   │       └─(conditional_expression,[logical_or_expression])
+        │   │         └─(logical_or_expression,[logical_and_expression])
+        │   │           └─(logical_and_expression,[inclusive_or_expression])
+        │   │             └─(inclusive_or_expression,[exclusive_or_expression])
+        │   │               └─(exclusive_or_expression,[and_expression])
+        │   │                 └─(and_expression,[equality_expression])
+        │   │                   └─(equality_expression,[relational_expression])
+        │   │                     └─(relational_expression,[shift_expression])
+        │   │                       └─(shift_expression,[additive_expression])
+        │   │                         └─(additive_expression,[multiplicative_expression])
+        │   │                           └─(multiplicative_expression,[cast_expression])
+        │   │                             └─(cast_expression,[unary_expression])
+        │   │                               └─(unary_expression,[postfix_expression])
+        │   │                                 └─(postfix_expression,[primary_expression])
+        │   │                                   └─(primary_expression,[CONSTANT])
+        │   │                                     └─(128,0)
+        │   └─(59,;)
+        ├─(statement_list,[statement])
+        │ └─(statement,[jump_statement])
+        │   └─(jump_statement,[RETURN, expression, ';'])
+        │     ├─(181,return)
+        │     ├─(expression,[assignment_expression])
+        │     │ └─(assignment_expression,[conditional_expression])
+        │     │   └─(conditional_expression,[logical_or_expression])
+        │     │     └─(logical_or_expression,[logical_and_expression])
+        │     │       └─(logical_and_expression,[inclusive_or_expression])
+        │     │         └─(inclusive_or_expression,[exclusive_or_expression])
+        │     │           └─(exclusive_or_expression,[and_expression])
+        │     │             └─(and_expression,[equality_expression])
+        │     │               └─(equality_expression,[relational_expression])
+        │     │                 └─(relational_expression,[shift_expression])
+        │     │                   └─(shift_expression,[additive_expression])
+        │     │                     └─(additive_expression,[multiplicative_expression])
+        │     │                       └─(multiplicative_expression,[cast_expression])
+        │     │                         └─(cast_expression,[unary_expression])
+        │     │                           └─(unary_expression,[postfix_expression])
+        │     │                             └─(postfix_expression,[primary_expression])
+        │     │                               └─(primary_expression,[IDENTIFIER])
+        │     │                                 └─(10000,a)
+        │     └─(59,;)
+        └─(125,})
+```
