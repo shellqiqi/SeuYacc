@@ -51,3 +51,7 @@ We prefer shift-in instead of reduce to solve IF-ELSE ambiguity.
 We did not consider priorities and integration.
 
 And a too big output C++ file.
+
+## Example
+
+Branch master does not give any output unless you have written a usable yacc file like [branch symbol](https://github.com/shellqiqi/SeuYacc/tree/symbol) which provides a real time symbol table output. There is another version to print a syntax tree. Check [branch syntax_tree](https://github.com/shellqiqi/SeuYacc/tree/syntax_tree).
